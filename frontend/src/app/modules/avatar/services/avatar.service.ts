@@ -112,7 +112,12 @@ export class AvatarService {
   }
 
   resolveAvatarImageUrl(avatar: Pick<AvatarModel, 'generatedAvatarImageUrl' | 'photoUrl' | 'photoUrls' | 'modelUrl' | 'updatedAt'> | null | undefined): string {
-    const source = avatar?.generatedAvatarImageUrl || avatar?.photoUrl || avatar?.photoUrls?.[0] || avatar?.modelUrl || '';
+    const source = [
+      avatar?.generatedAvatarImageUrl,
+      avatar?.photoUrl,
+      ...(avatar?.photoUrls ?? [])
+    ].find(candidate => this.isRenderableImageSource(candidate)) || '';
+
     if (!source) {
       return '';
     }
@@ -129,6 +134,20 @@ export class AvatarService {
     const version = avatar?.updatedAt ? new Date(avatar.updatedAt).getTime() : Date.now();
     const separator = url.includes('?') ? '&' : '?';
     return `${url}${separator}v=${version}`;
+  }
+
+  private isRenderableImageSource(source?: string | null): source is string {
+    if (!source) {
+      return false;
+    }
+
+    const normalized = source.toLowerCase();
+    return normalized.startsWith('data:image/')
+      || normalized.endsWith('.png')
+      || normalized.endsWith('.jpg')
+      || normalized.endsWith('.jpeg')
+      || normalized.endsWith('.webp')
+      || normalized.includes('/uploads/');
   }
 
   deleteAvatar(id: string): Observable<void> {
