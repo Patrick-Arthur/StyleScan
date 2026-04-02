@@ -121,6 +121,7 @@ app.UseForwardedHeaders();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<StyleScanDbContext>();
+    await dbContext.Database.MigrateAsync();
     dbContext.Database.ExecuteSqlRaw(
         """
         DO $$
