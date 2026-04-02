@@ -403,7 +403,7 @@ namespace StyleScan.Backend.Services.Implementations
             var model = _configuration["ExternalApis:OpenAI:Model"]?.Trim();
             if (string.IsNullOrWhiteSpace(model))
             {
-                model = "gpt-image-1-mini";
+                model = "gpt-image-1";
             }
 
             var payload = new JsonObject
@@ -512,10 +512,12 @@ Create a highly faithful full-body 2D fashion avatar using the reference photos 
 
 Identity fidelity rules:
 - Preserve the same person from the photos with maximum fidelity.
-- Match facial structure, jawline, nose, lips, eyes, eyebrows, ears, hairline, hairstyle, hair volume, and hair color as closely as possible.
-- Match skin tone, body proportions, shoulder width, torso length, waist position, hip width, leg length, and overall silhouette closely to the references.
-- If there are multiple photos, combine them to improve fidelity instead of averaging them into a generic face or body.
-- Do not beautify, idealize, age up, age down, slim down, bulk up, feminize, masculinize, or otherwise stylize the person away from the references.
+- Match facial structure, jawline, cheek volume, nose shape, lips, eyes, eyebrows, ears, forehead, hairline, hairstyle, hair texture, hair volume, and hair color as closely as possible.
+- Match skin tone, undertone, body proportions, shoulder width, torso length, waist position, hip width, arm thickness, leg length, neck shape, and overall silhouette closely to the references.
+- If there are multiple photos, use them to improve consistency and identity fidelity, not to average the person into a generic model.
+- Preserve any visible asymmetry or distinctive traits that help the face and body remain recognizable.
+- Do not beautify, idealize, age up, age down, slim down, bulk up, feminize, masculinize, smooth out, or otherwise stylize the person away from the references.
+- Do not generate a generic fashion model. The result must feel recognizably like the same individual from the photos.
 
 Composition rules:
 - Create a single full-body avatar facing forward in a neutral standing pose.
@@ -526,10 +528,12 @@ Composition rules:
 
 Visual style rules:
 - Premium editorial fashion app look.
-- Semi-realistic 2D illustration or polished digital portrait, not 3D, not photorealistic, not cartoonish.
+- Semi-realistic 2D illustration or polished digital portrait, not 3D, not photorealistic, not cartoonish, and not emoji-like.
 - Clean soft studio lighting.
 - Natural anatomy only, with realistic hands, arms, legs, and feet.
 - No duplicated limbs, no cropped head, no cropped feet, no deformed hands, no distorted face.
+- Keep the face readable and proportionate.
+- Avoid oversized head, tiny feet, toy-like proportions, rounded mascot body shapes, or simplified character design.
 
 Wardrobe rules:
 - Dress the person in simple fitted neutral clothing suitable for a try-on base layer.
@@ -553,6 +557,7 @@ Output requirements:
 - Prioritize fidelity over creativity.
 - The result must look like the same person from the references, not a generic model.
 - Transparent or very light plain background preferred.
+- The output should feel premium, recognizable, balanced, and suitable as a try-on base in a fashion app.
 """;
         }
 
