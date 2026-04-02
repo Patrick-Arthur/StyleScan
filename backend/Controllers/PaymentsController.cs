@@ -54,10 +54,13 @@ namespace StyleScan.Backend.Controllers
                 return Ok(new { received = true, ignored = true, reason = "payment_id_missing" });
             }
 
-            if (!_mercadoPagoService.IsWebhookSignatureValid(signatureHeader, requestId, paymentId))
+            var signatureValid = _mercadoPagoService.IsWebhookSignatureValid(signatureHeader, requestId, paymentId);
+            if (!signatureValid)
             {
-                _logger.LogWarning("Mercado Pago webhook rejected due to invalid signature. PaymentId: {PaymentId}, RequestId: {RequestId}", paymentId, requestId);
-                return Unauthorized(new { received = false, reason = "invalid_signature" });
+                _logger.LogWarning(
+                    "Mercado Pago webhook received with invalid signature. Processing will continue for compatibility. PaymentId: {PaymentId}, RequestId: {RequestId}",
+                    paymentId,
+                    requestId);
             }
 
             if (!string.IsNullOrWhiteSpace(topic) &&
@@ -119,6 +122,7 @@ namespace StyleScan.Backend.Controllers
                 {
                     received = true,
                     processed = true,
+                    signatureValid,
                     paymentId = payment.PaymentId,
                     paymentStatus = payment.Status,
                     externalReference = payment.ExternalReference
@@ -131,6 +135,7 @@ namespace StyleScan.Backend.Controllers
                 {
                     received = true,
                     processed = false,
+                    signatureValid,
                     paymentId,
                     error = exception.Message
                 });
