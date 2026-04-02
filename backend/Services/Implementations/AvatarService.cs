@@ -172,15 +172,12 @@ namespace StyleScan.Backend.Services.Implementations
                 return null;
             }
 
-            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(existingUser => existingUser.Id == avatar.UserId)
-                ?? throw new InvalidOperationException("Usuario nao encontrado para gerar avatar.");
-            var plan = AccountPlanCatalog.Resolve(user.AccountPlan);
-            await EnsureUsageLimitAsync(avatar.UserId, UsageMetricType.RealisticRender, plan.RealisticRendersPerMonth, "Seu plano atual atingiu o limite mensal de geracoes realistas.");
-
+            // The avatar base is part of onboarding and iteration, so it should not
+            // consume the user's monthly realistic-render quota. That quota remains
+            // enforced for realistic try-on generations inside the looks flow.
             avatar.GeneratedAvatarImageUrl = await TryGenerateWithOpenAiAsync(avatar)
                 ?? await CreateGeneratedAvatarAssetAsync(avatar);
             avatar.UpdatedAt = DateTime.UtcNow;
-            await IncrementUsageAsync(avatar.UserId, UsageMetricType.RealisticRender, DateTime.UtcNow);
             await _context.SaveChangesAsync();
 
             return MapAvatarResponse(avatar);
@@ -572,6 +569,7 @@ Measurement guidance:
 - The photos remain the main source of truth for shape, tattoos, face, and posture.
 - If the numeric measurements and the photos differ slightly, prefer the photos for identity and the measurements for overall scale/proportion.
 - Measurements should improve realism, not inflate body mass.
+- Never infer extra adiposity from weight alone. Use weight only as a secondary scale reference, not as permission to make the person bulkier or softer than the photos.
 
 Critical fit guidance:
 - Preserve a natural male body with only the level of abdominal projection that is truly visible in the side and front photos.
@@ -581,6 +579,7 @@ Critical fit guidance:
 - Do not turn this person into a lean fashion mannequin.
 - Also do not turn this person into a visibly heavier version of himself.
 - When uncertain, choose the leaner of two close interpretations as long as identity and proportions remain faithful to the photos.
+- Keep the cheeks, neck, shoulder line, ribcage, abdomen, and arms visually closer to the reference photos than to the numeric weight.
 
 Output requirements:
 - Single full-body 2D avatar image.
