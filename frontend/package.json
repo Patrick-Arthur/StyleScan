@@ -6,8 +6,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:railway": "ng serve --configuration staging",
     "start:public": "ng serve --configuration public",
     "build": "ng build",
+    "build:staging": "ng build --configuration staging",
     "build:public": "ng build --configuration public",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
