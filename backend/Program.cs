@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 using StyleScan.Backend.Models.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,6 +105,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var allowedOriginsSet = new HashSet<string>(allowedOrigins, StringComparer.OrdinalIgnoreCase);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins",
@@ -378,7 +380,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        var origin = context.Context.Request.Headers.Origin.ToString();
+        if (!string.IsNullOrWhiteSpace(origin) && allowedOriginsSet.Contains(origin))
+        {
+            context.Context.Response.Headers["Access-Control-Allow-Origin"] = origin;
+            context.Context.Response.Headers["Vary"] = "Origin";
+            context.Context.Response.Headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+            context.Context.Response.Headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS";
+        }
+    }
+});
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
