@@ -3,13 +3,24 @@
 ## Estrutura recomendada
 
 - Crie um novo projeto no Railway
-- Aponte o serviço para a pasta `backend`
-- Deixe o Railway usar `Nixpacks`
-- O arquivo `nixpacks.toml` desta pasta já define build e start
+- Conecte o repositorio do GitHub
+- Use `backend` como `Root Directory`
+- Use o `Dockerfile` desta pasta como builder
 
-## Variáveis de ambiente
+## Se aparecer o erro do Railpack
 
-Configure estas variáveis no serviço:
+Se o deploy falhar com `Error creating build plan with Railpack`:
+
+1. Abra o servico no Railway
+2. Entre em `Settings`
+3. Procure a configuracao de `Builder`
+4. Troque de `Railpack/Nixpacks` para `Dockerfile`
+5. Confirme que o `Root Directory` esta como `backend`
+6. Rode um novo deploy
+
+## Variaveis de ambiente
+
+Configure estas variaveis no servico:
 
 - `ASPNETCORE_ENVIRONMENT=Production`
 - `ConnectionStrings__DefaultConnection=Host=...;Port=5432;Database=...;Username=...;Password=...;SSL Mode=Require;Trust Server Certificate=true`
@@ -29,30 +40,25 @@ Configure estas variáveis no serviço:
 - `ExternalApis__MercadoPago__NotificationUrl=https://SEU-BACKEND/api/v1/payments/mercado-pago/webhook`
 - `Cors__AllowedOrigins__0=https://stylescan2000.netlify.app`
 
-Se depois você usar domínio próprio, troque as URLs acima para:
-
-- `https://stylescan.app`
-- `https://api.stylescan.app`
+Se depois voce usar dominio proprio, troque as URLs acima para o dominio final.
 
 ## Banco de dados
 
-Você pode:
+Voce pode:
 
-1. Criar um PostgreSQL no próprio Railway
+1. Criar um PostgreSQL no proprio Railway
 2. Ou usar Neon/Supabase e colar a connection string em `ConnectionStrings__DefaultConnection`
 
 ## Checklist final
 
-1. Deploy do backend concluído
-2. URL pública do backend abrindo `/health`
-3. `ExternalApis__MercadoPago__NotificationUrl` apontando para a URL pública final
+1. Deploy do backend concluido
+2. URL publica do backend abrindo `/health`
+3. `ExternalApis__MercadoPago__NotificationUrl` apontando para a URL publica final
 4. Webhook do Mercado Pago configurado para a mesma URL
-5. Frontend público recompilado apontando para a API estável
+5. Frontend publico recompilado apontando para a API estavel
 
-## Testes rápidos
+## Testes rapidos
 
 - `GET https://SEU-BACKEND/health`
 - `GET https://SEU-BACKEND/api/v1/public/profiles/slug`
 - `GET https://SEU-BACKEND/api/v1/public/looks/slug`
-
-Quando a URL estável existir, atualize também o frontend público para ela.

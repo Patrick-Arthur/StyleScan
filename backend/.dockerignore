@@ -1,0 +1,11 @@
+bin/
+obj/
+bin-temp/
+run.err.log
+run.out.log
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.cache
