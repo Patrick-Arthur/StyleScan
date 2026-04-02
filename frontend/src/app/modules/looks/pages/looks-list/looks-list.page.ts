@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { ActionSheetController, AlertController, IonicModule } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { AccountPlanService } from 'src/app/core/services/account-plan.service';
 import { ShareService } from 'src/app/core/services/share.service';
@@ -126,6 +126,7 @@ export class LooksListPage implements OnInit {
     private shopService: ShopService,
     private looksService: LooksService,
     private alertController: AlertController,
+    private actionSheetController: ActionSheetController,
     private userService: UserService,
     private shareService: ShareService
   ) {}
@@ -929,23 +930,51 @@ export class LooksListPage implements OnInit {
       ? `${environment.publicSiteUrl}/look/${this.currentSavedLook.shareSlug}`
       : this.currentSavedLook
         ? `${window.location.origin}/looks/${this.currentSavedLook.id}`
-        : undefined;
+        : environment.publicSiteUrl;
 
-    const shared = await this.shareService.share({
+    const payload = {
       title: `StyleScan | ${title}`,
       text,
       url,
       imageUrl
+    };
+
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Compartilhar resultado',
+      subHeader: 'Escolha onde deseja divulgar esse preview.',
+      buttons: [
+        {
+          text: 'WhatsApp',
+          handler: () => void this.handleShareAction(() => this.shareService.openWhatsApp(payload), 'Link pronto para enviar no WhatsApp.')
+        },
+        {
+          text: 'Facebook',
+          handler: () => void this.handleShareAction(() => this.shareService.openFacebook(payload), 'Link aberto para compartilhar no Facebook.')
+        },
+        {
+          text: 'Instagram',
+          handler: () => void this.handleShareAction(() => this.shareService.prepareInstagram(payload), 'Imagem baixada e legenda copiada para publicar no Instagram.')
+        },
+        {
+          text: 'Baixar imagem',
+          handler: () => void this.handleShareAction(() => this.shareService.downloadImage(payload.imageUrl, title), 'Imagem baixada com sucesso.')
+        },
+        {
+          text: 'Copiar legenda',
+          handler: () => void this.handleShareAction(() => this.shareService.copyCaption(payload), 'Legenda copiada.')
+        },
+        {
+          text: 'Mais opcoes do dispositivo',
+          handler: () => void this.handleShareAction(() => this.shareService.shareNative(payload), 'Resultado pronto para compartilhar.')
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
     });
 
-    if (!shared) {
-      this.error = 'Nao foi possivel compartilhar esse resultado agora.';
-      return;
-    }
-
-    await this.registerSharedLook();
-    this.success = 'Resultado pronto para compartilhar.';
-    this.error = '';
+    await actionSheet.present();
   }
 
   reloadSavedLook(look: LookModel): void {
@@ -1273,6 +1302,18 @@ export class LooksListPage implements OnInit {
     const httpError = error as HttpErrorResponse;
     this.error = httpError.error?.message || fallbackMessage;
     console.error(error);
+  }
+
+  private async handleShareAction(action: () => Promise<boolean>, successMessage: string): Promise<void> {
+    const shared = await action();
+    if (!shared) {
+      this.error = 'Nao foi possivel compartilhar esse resultado agora.';
+      return;
+    }
+
+    await this.registerSharedLook();
+    this.success = successMessage;
+    this.error = '';
   }
 }
 

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { AccountPlanService } from 'src/app/core/services/account-plan.service';
+import { ShareService } from 'src/app/core/services/share.service';
 import { LookModel, LooksService } from 'src/app/modules/looks/services/looks.service';
 import { environment } from 'src/environments/environment';
 import { UserProfile, UserService } from '../../services/user.service';
@@ -36,7 +37,8 @@ export class ProfilePage implements OnInit {
     private router: Router,
     private userService: UserService,
     private accountPlanService: AccountPlanService,
-    private looksService: LooksService
+    private looksService: LooksService,
+    private shareService: ShareService
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +71,35 @@ export class ProfilePage implements OnInit {
     }
 
     return `${environment.publicSiteUrl}/p/${this.user.publicProfileSlug}`;
+  }
+
+  async sharePublicProfile(): Promise<void> {
+    if (!this.user?.publicProfileSlug) {
+      return;
+    }
+
+    const shared = await this.shareService.shareNative({
+      title: `Vitrine StyleScan de ${this.displayName}`,
+      text: 'Veja meus looks publicados no StyleScan.',
+      url: this.publicProfileUrl
+    });
+
+    this.feedback = shared
+      ? 'Vitrine publica preparada para compartilhar.'
+      : 'Nao foi possivel compartilhar sua vitrine agora.';
+  }
+
+  async copyPublicProfileLink(): Promise<void> {
+    if (!this.user?.publicProfileSlug) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(this.publicProfileUrl);
+      this.feedback = 'Link da vitrine publica copiado.';
+    } catch {
+      this.error = 'Nao foi possivel copiar o link da vitrine.';
+    }
   }
 
   async loadProfile(): Promise<void> {
