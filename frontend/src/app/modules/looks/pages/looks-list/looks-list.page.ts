@@ -85,6 +85,7 @@ export class LooksListPage implements OnInit {
   tryOnUsedAi = false;
   tryOnMode: 'avatar' | 'realistic' = 'avatar';
   stageViewMode: 'result' | 'base' = 'result';
+  stageImageErrorCount = 0;
   previewHistory: TryOnPreviewHistoryModel[] = [];
   favoriteLookIds = new Set<string>();
   manualCollections: LookCollectionModel[] = [];
@@ -148,11 +149,14 @@ export class LooksListPage implements OnInit {
   }
 
   get stageImageUrl(): string {
-    if (this.stageViewMode === 'base') {
-      return this.currentAvatarImageUrl;
-    }
+    const avatarGallery = this.avatarService.resolveAvatarGallery(this.currentAvatar);
+    const avatarFallback = avatarGallery[0] || this.currentAvatarImageUrl;
+    const candidates = this.stageViewMode === 'base'
+      ? [avatarFallback, ...avatarGallery]
+      : [this.tryOnPreviewUrl, avatarFallback, ...avatarGallery];
 
-    return this.tryOnPreviewUrl || this.currentAvatarImageUrl;
+    const validCandidates = candidates.filter((candidate, index, list) => !!candidate && list.indexOf(candidate) === index);
+    return validCandidates[this.stageImageErrorCount] || '';
   }
 
   get hasGeneratedPreview(): boolean {
@@ -696,6 +700,10 @@ export class LooksListPage implements OnInit {
     this.error = '';
   }
 
+  onStageImageError(): void {
+    this.stageImageErrorCount += 1;
+  }
+
   clearSavedLookFilters(): void {
     this.savedLooksSearchTerm = '';
     this.savedLooksOccasionFilter = 'all';
@@ -748,6 +756,7 @@ export class LooksListPage implements OnInit {
       this.tryOnUsedAi = preview.usedAi;
       this.tryOnMode = mode;
       this.stageViewMode = 'result';
+      this.stageImageErrorCount = 0;
       await firstValueFrom(this.accountPlanService.loadRemoteState());
       await this.loadPreviewHistory();
       this.success = preview.usedAi
@@ -1013,6 +1022,7 @@ export class LooksListPage implements OnInit {
     this.tryOnUsedAi = item.usedAi;
     this.tryOnMode = item.mode;
     this.stageViewMode = 'result';
+    this.stageImageErrorCount = 0;
     this.success = 'Preview anterior reaplicado no studio.';
     this.error = '';
   }
@@ -1278,6 +1288,7 @@ export class LooksListPage implements OnInit {
     this.tryOnPreviewUrl = '';
     this.tryOnUsedAi = false;
     this.tryOnMode = 'avatar';
+    this.stageImageErrorCount = 0;
   }
 
   private sortSavedLooks(left: LookModel, right: LookModel): number {

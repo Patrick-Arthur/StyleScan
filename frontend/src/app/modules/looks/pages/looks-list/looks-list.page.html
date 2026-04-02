@@ -101,7 +101,7 @@
           </div>
 
           <div class="avatar-viewer" [ngStyle]="avatarCanvasStyle">
-            <img *ngIf="stageImageUrl" class="avatar-photo-base" [class.try-on-active]="tryOnPreviewUrl" [src]="stageImageUrl" [alt]="currentAvatar?.name || ''">
+            <img *ngIf="stageImageUrl" class="avatar-photo-base" [class.try-on-active]="tryOnPreviewUrl" [src]="stageImageUrl" [alt]="currentAvatar?.name || ''" (error)="onStageImageError()">
             <div class="avatar-aura" [style.--accent]="activeBoard.accent"></div>
             <div class="avatar-mannequin" *ngIf="!stageImageUrl" [ngStyle]="mannequinStyle">
               <div class="mannequin-head" [ngStyle]="bodyStyles.head"></div>
