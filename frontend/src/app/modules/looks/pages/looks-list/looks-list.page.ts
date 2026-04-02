@@ -917,7 +917,12 @@ export class LooksListPage implements OnInit {
   }
 
   async shareCurrentResult(): Promise<void> {
-    const imageUrl = this.tryOnPreviewUrl || this.currentSavedLook?.heroImageUrl || this.selectedProducts[0]?.imageUrl || '';
+    const imageUrl = this.activeCoverPreviewUrl
+      || this.currentOrLatestPreviewUrl
+      || this.tryOnPreviewUrl
+      || this.currentSavedLook?.heroImageUrl
+      || this.currentAvatarImageUrl
+      || '';
     const title = this.currentSavedLook?.name || this.customLookName || this.activeBoard.title;
     const text = `Montei um look no StyleScan: ${title} • ${this.activeBoard.title} • ${this.selectedProducts.length} pecas.`;
     const url = this.currentSavedLook?.isPublished && this.currentSavedLook.shareSlug

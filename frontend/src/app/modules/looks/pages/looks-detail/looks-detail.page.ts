@@ -269,7 +269,7 @@ export class LooksDetailPage implements OnInit {
       title: `StyleScan | ${this.look.name}`,
       text: `Olha esse look que montei no StyleScan: ${this.look.name} • ${this.look.style} • ${this.look.occasion}`,
       url: this.publicLookUrl || window.location.href,
-      imageUrl: this.look.heroImageUrl || this.look.items[0]?.imageUrl
+      imageUrl: this.look.heroImageUrl || undefined
     });
 
     if (!shared) {
