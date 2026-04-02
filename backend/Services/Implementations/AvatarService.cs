@@ -521,6 +521,7 @@ Identity fidelity rules:
 - Match facial structure, jawline, cheek volume, nose shape, lips, eyes, eyebrows, ears, forehead, hairline, hairstyle, hair texture, hair volume, and hair color as closely as possible.
 - Match skin tone, undertone, body proportions, shoulder width, torso length, waist position, hip width, arm thickness, leg length, neck shape, and overall silhouette closely to the references.
 - Respect the body's actual volume and distribution shown in the photos, especially abdomen projection, waist softness, chest shape, upper arms, lower back, glutes, thighs, and calves.
+- Keep body mass interpretation neutral and precise. Preserve natural softness if present, but do not enlarge the torso, face, abdomen, hips, or limbs beyond what is visible in the references.
 - If there are multiple photos, use them to improve consistency and identity fidelity, not to average the person into a generic model.
 - Use the front, close-up, back, and side references together to preserve shape from every angle.
 - Preserve any visible asymmetry or distinctive traits that help the face and body remain recognizable.
@@ -545,6 +546,8 @@ Visual style rules:
 - Avoid oversized head, tiny feet, toy-like proportions, rounded mascot body shapes, or simplified character design.
 - Avoid creating an artificially athletic torso if the reference body is softer or more natural.
 - Avoid flattening the stomach, narrowing the waist, widening the shoulders, or reducing the natural body volume seen in the photos.
+- Avoid overcompensating in the opposite direction by making the person heavier, broader, puffier, or rounder than the references.
+- Do not add extra fullness to the cheeks, neck, chest, abdomen, waist, hips, thighs, or upper arms.
 
 Wardrobe rules:
 - Dress the person in simple fitted neutral clothing suitable for a try-on base layer.
@@ -568,13 +571,16 @@ Measurement guidance:
 - Use these measurements as a corrective anchor so the avatar proportions stay coherent with the real person from the photos.
 - The photos remain the main source of truth for shape, tattoos, face, and posture.
 - If the numeric measurements and the photos differ slightly, prefer the photos for identity and the measurements for overall scale/proportion.
+- Measurements should improve realism, not inflate body mass.
 
 Critical fit guidance:
-- Preserve a natural male body with mild abdominal projection if present.
+- Preserve a natural male body with only the level of abdominal projection that is truly visible in the side and front photos.
 - Preserve the actual waistline and side profile from the references.
 - Preserve back width and softness from the rear view.
 - Preserve arm thickness and leg volume from the full-body references.
 - Do not turn this person into a lean fashion mannequin.
+- Also do not turn this person into a visibly heavier version of himself.
+- When uncertain, choose the leaner of two close interpretations as long as identity and proportions remain faithful to the photos.
 
 Output requirements:
 - Single full-body 2D avatar image.
