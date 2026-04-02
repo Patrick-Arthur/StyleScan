@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 
 export interface AvatarMeasurements {
   height: number;
+  weight: number;
   chest: number;
   waist: number;
   hips: number;
@@ -62,6 +63,7 @@ export class AvatarService {
     formData.append('bodyType', payload.bodyType);
     formData.append('skinTone', payload.skinTone);
     formData.append('height', String(payload.height));
+    formData.append('weight', String(payload.weight));
     formData.append('chest', String(payload.chest));
     formData.append('waist', String(payload.waist));
     formData.append('hips', String(payload.hips));

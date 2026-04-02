@@ -64,6 +64,7 @@ namespace StyleScan.Backend.Services.Implementations
                 BodyType = request.BodyType.Trim(),
                 SkinTone = request.SkinTone.Trim(),
                 Height = request.Height,
+                Weight = request.Weight,
                 Chest = request.Chest,
                 Waist = request.Waist,
                 Hips = request.Hips,
@@ -98,6 +99,7 @@ namespace StyleScan.Backend.Services.Implementations
                     BodyType = avatar.BodyType,
                     SkinTone = avatar.SkinTone,
                     Height = avatar.Height,
+                    Weight = avatar.Weight,
                     Chest = avatar.Chest,
                     Waist = avatar.Waist,
                     Hips = avatar.Hips,
@@ -129,6 +131,7 @@ namespace StyleScan.Backend.Services.Implementations
             if (request.Measurements != null)
             {
                 avatar.Height = request.Measurements.Height;
+                avatar.Weight = request.Measurements.Weight;
                 avatar.Chest = request.Measurements.Chest;
                 avatar.Waist = request.Measurements.Waist;
                 avatar.Hips = request.Measurements.Hips;
@@ -210,6 +213,7 @@ namespace StyleScan.Backend.Services.Implementations
                 BodyType = avatar.BodyType,
                 SkinTone = avatar.SkinTone,
                 Height = avatar.Height,
+                Weight = avatar.Weight,
                 Chest = avatar.Chest,
                 Waist = avatar.Waist,
                 Hips = avatar.Hips,
@@ -465,7 +469,7 @@ namespace StyleScan.Backend.Services.Implementations
             }
 
             var references = new List<string>();
-            foreach (var source in sources.Take(2))
+            foreach (var source in sources.Take(4))
             {
                 if (string.IsNullOrWhiteSpace(source) || source.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || source.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                 {
@@ -506,6 +510,8 @@ namespace StyleScan.Backend.Services.Implementations
             var gender = string.IsNullOrWhiteSpace(avatar.Gender) ? "not specified" : avatar.Gender;
             var bodyType = string.IsNullOrWhiteSpace(avatar.BodyType) ? "balanced" : avatar.BodyType;
             var skinTone = string.IsNullOrWhiteSpace(avatar.SkinTone) ? "medium" : avatar.SkinTone;
+            var hasWeight = avatar.Weight > 0;
+            var hasMeasurements = avatar.Height > 0 || avatar.Weight > 0 || avatar.Chest > 0 || avatar.Waist > 0 || avatar.Hips > 0;
 
             return $"""
 Create a highly faithful full-body 2D fashion avatar using the reference photos as the primary source of truth.
@@ -514,8 +520,11 @@ Identity fidelity rules:
 - Preserve the same person from the photos with maximum fidelity.
 - Match facial structure, jawline, cheek volume, nose shape, lips, eyes, eyebrows, ears, forehead, hairline, hairstyle, hair texture, hair volume, and hair color as closely as possible.
 - Match skin tone, undertone, body proportions, shoulder width, torso length, waist position, hip width, arm thickness, leg length, neck shape, and overall silhouette closely to the references.
+- Respect the body's actual volume and distribution shown in the photos, especially abdomen projection, waist softness, chest shape, upper arms, lower back, glutes, thighs, and calves.
 - If there are multiple photos, use them to improve consistency and identity fidelity, not to average the person into a generic model.
+- Use the front, close-up, back, and side references together to preserve shape from every angle.
 - Preserve any visible asymmetry or distinctive traits that help the face and body remain recognizable.
+- Preserve visible tattoos, tattoo placement, relative tattoo scale, beard shape, eyebrow shape, and hairline faithfully.
 - Do not beautify, idealize, age up, age down, slim down, bulk up, feminize, masculinize, smooth out, or otherwise stylize the person away from the references.
 - Do not generate a generic fashion model. The result must feel recognizably like the same individual from the photos.
 
@@ -534,12 +543,15 @@ Visual style rules:
 - No duplicated limbs, no cropped head, no cropped feet, no deformed hands, no distorted face.
 - Keep the face readable and proportionate.
 - Avoid oversized head, tiny feet, toy-like proportions, rounded mascot body shapes, or simplified character design.
+- Avoid creating an artificially athletic torso if the reference body is softer or more natural.
+- Avoid flattening the stomach, narrowing the waist, widening the shoulders, or reducing the natural body volume seen in the photos.
 
 Wardrobe rules:
 - Dress the person in simple fitted neutral clothing suitable for a try-on base layer.
-- Prefer a clean sleeveless or short-sleeve top and fitted pants or shorts in neutral tones.
+- Prefer a clean fitted tank or sleeveless base top and fitted shorts or shorts-like base bottom in neutral tones.
 - Avoid bold patterns, coats, accessories, hats, bags, or dramatic styling.
 - The clothing must not hide the body silhouette.
+- Keep the base outfit close to the body but not compression-tight.
 
 Avatar profile:
 - Name: {avatar.Name}
@@ -547,9 +559,22 @@ Avatar profile:
 - Body type: {bodyType}
 - Skin tone: {skinTone}
 - Height in cm: {avatar.Height.ToString(CultureInfo.InvariantCulture)}
+- Weight in kg: {(hasWeight ? avatar.Weight.ToString(CultureInfo.InvariantCulture) : "not provided")}
 - Chest in cm: {avatar.Chest.ToString(CultureInfo.InvariantCulture)}
 - Waist in cm: {avatar.Waist.ToString(CultureInfo.InvariantCulture)}
 - Hips in cm: {avatar.Hips.ToString(CultureInfo.InvariantCulture)}
+
+Measurement guidance:
+- Use these measurements as a corrective anchor so the avatar proportions stay coherent with the real person from the photos.
+- The photos remain the main source of truth for shape, tattoos, face, and posture.
+- If the numeric measurements and the photos differ slightly, prefer the photos for identity and the measurements for overall scale/proportion.
+
+Critical fit guidance:
+- Preserve a natural male body with mild abdominal projection if present.
+- Preserve the actual waistline and side profile from the references.
+- Preserve back width and softness from the rear view.
+- Preserve arm thickness and leg volume from the full-body references.
+- Do not turn this person into a lean fashion mannequin.
 
 Output requirements:
 - Single full-body 2D avatar image.
@@ -558,6 +583,7 @@ Output requirements:
 - The result must look like the same person from the references, not a generic model.
 - Transparent or very light plain background preferred.
 - The output should feel premium, recognizable, balanced, and suitable as a try-on base in a fashion app.
+- Use the provided measurements assertively to improve proportion accuracy.{(hasMeasurements ? string.Empty : " If measurements are missing, rely entirely on the photos.")}
 """;
         }
 

@@ -38,6 +38,7 @@ export class AvatarCustomizePage implements OnInit {
       bodyType: ['', Validators.required],
       skinTone: ['', Validators.required],
       height: [0, [Validators.required, Validators.min(120), Validators.max(230)]],
+      weight: [0, [Validators.required, Validators.min(35), Validators.max(250)]],
       chest: [0, [Validators.required, Validators.min(50), Validators.max(180)]],
       waist: [0, [Validators.required, Validators.min(40), Validators.max(180)]],
       hips: [0, [Validators.required, Validators.min(50), Validators.max(200)]]
@@ -85,6 +86,7 @@ export class AvatarCustomizePage implements OnInit {
         skinTone: this.avatarForm.value.skinTone,
         measurements: {
           height: this.avatarForm.value.height,
+          weight: this.avatarForm.value.weight,
           chest: this.avatarForm.value.chest,
           waist: this.avatarForm.value.waist,
           hips: this.avatarForm.value.hips
@@ -109,6 +111,7 @@ export class AvatarCustomizePage implements OnInit {
       bodyType: this.avatar.bodyType,
       skinTone: this.avatar.skinTone,
       height: this.avatar.height,
+      weight: this.avatar.weight,
       chest: this.avatar.chest,
       waist: this.avatar.waist,
       hips: this.avatar.hips
@@ -177,6 +180,7 @@ export class AvatarCustomizePage implements OnInit {
       bodyType: this.avatar.bodyType,
       skinTone: this.avatar.skinTone,
       height: this.avatar.height,
+      weight: this.avatar.weight,
       chest: this.avatar.chest,
       waist: this.avatar.waist,
       hips: this.avatar.hips

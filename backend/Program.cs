@@ -162,6 +162,12 @@ using (var scope = app.Services.CreateScope())
 
     dbContext.Database.ExecuteSqlRaw(
         """
+        ALTER TABLE "Avatars"
+        ADD COLUMN IF NOT EXISTS "Weight" double precision NOT NULL DEFAULT 0;
+        """);
+
+    dbContext.Database.ExecuteSqlRaw(
+        """
         ALTER TABLE "Users"
         ADD COLUMN IF NOT EXISTS "AccountPlan" character varying(32) NOT NULL DEFAULT 'free';
         """);

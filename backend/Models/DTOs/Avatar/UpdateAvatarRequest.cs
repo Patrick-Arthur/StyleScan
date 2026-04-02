@@ -12,6 +12,7 @@ namespace StyleScan.Backend.Models.DTOs.Avatar
     public class AvatarMeasurements
     {
         public double Height { get; set; }
+        public double Weight { get; set; }
         public double Chest { get; set; }
         public double Waist { get; set; }
         public double Hips { get; set; }

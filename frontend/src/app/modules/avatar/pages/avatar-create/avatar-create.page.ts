@@ -36,6 +36,7 @@ export class AvatarCreatePage implements OnInit {
       bodyType: ['average', Validators.required],
       skinTone: ['medium', Validators.required],
       height: [170, [Validators.required, Validators.min(120), Validators.max(230)]],
+      weight: [78, [Validators.required, Validators.min(35), Validators.max(250)]],
       chest: [90, [Validators.required, Validators.min(50), Validators.max(180)]],
       waist: [75, [Validators.required, Validators.min(40), Validators.max(180)]],
       hips: [95, [Validators.required, Validators.min(50), Validators.max(200)]]

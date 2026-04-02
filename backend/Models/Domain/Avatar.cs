@@ -16,6 +16,7 @@ namespace StyleScan.Backend.Models.Domain
         public string BodyType { get; set; } = string.Empty;
         public string SkinTone { get; set; } = string.Empty;
         public double Height { get; set; }
+        public double Weight { get; set; }
         public double Chest { get; set; }
         public double Waist { get; set; }
         public double Hips { get; set; }
