@@ -1,0 +1,94 @@
+<ion-content [fullscreen]="true" class="checkout-shell">
+  <div class="checkout-page" *ngIf="!loading">
+    <section class="checkout-hero card-shell">
+      <div>
+        <span class="eyebrow">Checkout premium</span>
+        <h1>Revise seu plano antes de conectar o pagamento real</h1>
+        <p>
+          Esta etapa ja representa o fluxo que depois vamos ligar ao Mercado Pago. Por enquanto,
+          ela confirma a assinatura em modo de teste.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <ion-button fill="outline" shape="round" (click)="goBack()">
+          <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+          Voltar aos planos
+        </ion-button>
+      </div>
+    </section>
+
+    <section class="checkout-grid">
+      <article class="checkout-summary card-shell">
+        <span class="eyebrow">Plano escolhido</span>
+        <h2>{{ selectedPlan.name }}</h2>
+        <div class="price-line">
+          <strong>{{ selectedPlan.price }}</strong>
+          <span>{{ selectedPlan.cadence }}</span>
+        </div>
+        <p>{{ selectedPlan.summary }}</p>
+
+        <div class="highlight-list">
+          <div class="highlight-item" *ngFor="let item of selectedPlan.highlights">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>{{ item }}</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="checkout-panel card-shell">
+        <span class="eyebrow">Mercado Pago depois</span>
+        <h2>Fluxo pronto para a integracao</h2>
+        <p>
+          Quando conectarmos o Mercado Pago, este bloco recebe o init point ou preferencia real de pagamento.
+          Ate la, ele funciona como um checkout de homologacao.
+        </p>
+
+        <div class="mock-payment">
+          <div class="mock-row">
+            <span>Checkout ID</span>
+            <strong>{{ checkoutId }}</strong>
+          </div>
+          <div class="mock-row">
+            <span>Gateway previsto</span>
+            <strong>Mercado Pago</strong>
+          </div>
+          <div class="mock-row">
+            <span>Status</span>
+            <strong>{{ liveCheckout ? 'Pronto para abrir no Mercado Pago' : 'Pronto para confirmar' }}</strong>
+          </div>
+        </div>
+
+        <div class="feedback-chip error" *ngIf="error">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>{{ error }}</span>
+        </div>
+
+        <div class="feedback-chip success" *ngIf="success">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ success }}</span>
+        </div>
+
+        <div class="checkout-actions">
+          <ion-button *ngIf="liveCheckout; else testConfirmation" expand="block" shape="round" [disabled]="!(sandboxCheckoutUrl || checkoutUrl)" (click)="openMercadoPagoCheckout()">
+            <ion-icon slot="start" name="open-outline"></ion-icon>
+            Abrir checkout Mercado Pago
+          </ion-button>
+          <ion-button *ngIf="liveCheckout" fill="outline" expand="block" shape="round" [disabled]="statusRefreshing" (click)="refreshPaymentStatus()">
+            <ion-icon slot="start" name="refresh-outline"></ion-icon>
+            {{ statusRefreshing ? 'Atualizando status...' : 'Ja fiz o pagamento' }}
+          </ion-button>
+          <ng-template #testConfirmation>
+            <ion-button expand="block" shape="round" [disabled]="confirming || !checkoutId" (click)="confirmSubscription()">
+              <ion-icon slot="start" name="diamond-outline"></ion-icon>
+              {{ confirming ? 'Confirmando assinatura...' : 'Confirmar assinatura de teste' }}
+            </ion-button>
+          </ng-template>
+          <ion-button fill="outline" expand="block" shape="round" (click)="goBack()">
+            Ajustar plano
+          </ion-button>
+        </div>
+      </article>
+    </section>
+  </div>
+</ion-content>

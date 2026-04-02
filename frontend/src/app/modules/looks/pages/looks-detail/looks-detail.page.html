@@ -1,0 +1,131 @@
+﻿<ion-content [fullscreen]="true" class="detail-shell">
+  <div class="feedback-state" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando look...</p>
+  </div>
+
+  <div class="feedback-state" *ngIf="error && !loading">
+    <p>{{ error }}</p>
+    <ion-button fill="outline" shape="round" (click)="loadLook()">Tentar novamente</ion-button>
+  </div>
+
+  <div class="detail-page" *ngIf="look && !loading">
+    <section class="hero-card card-shell">
+      <div class="hero-collage" *ngIf="heroImages.length > 0">
+        <img *ngFor="let image of heroImages" [src]="image" alt="Preview do look">
+      </div>
+      <span class="eyebrow">Look salvo</span>
+      <h1>{{ look.name }}</h1>
+      <p>{{ look.occasion }} / {{ look.style }} / {{ look.items.length }} pecas</p>
+      <p class="hero-note" *ngIf="look.note">{{ look.note }}</p>
+      <div class="hero-tags" *ngIf="look.occasionTags.length > 0">
+        <span *ngFor="let tag of look.occasionTags">{{ tag }}</span>
+      </div>
+      <div class="publication-badge" [class.is-live]="look.isPublished">
+        <ion-icon [name]="look.isPublished ? 'radio-outline' : 'lock-closed-outline'"></ion-icon>
+        <span>{{ publicationStatusLabel }}</span>
+      </div>
+      <div class="hero-collections" *ngIf="lookCollectionLabels.length > 0">
+        <button type="button" class="collection-pill" *ngFor="let collection of lookManualCollections" (click)="removeFromCollection(collection)">
+          {{ collection.label }} ×
+        </button>
+      </div>
+      <div class="hero-meta">
+        <strong>{{ look.totalPrice | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+        <span>{{ look.createdAt | date:'dd/MM/yyyy':'':'pt-BR' }}</span>
+      </div>
+      <ion-button fill="outline" shape="round" size="small" class="collection-action" (click)="addToCollection()">Adicionar a colecao</ion-button>
+    </section>
+
+    <section class="actions-card card-shell quick-actions">
+      <ion-button expand="block" shape="round" (click)="reopenInStudio()">Montar novamente no studio</ion-button>
+      <ion-button expand="block" fill="outline" shape="round" (click)="buyFullLook()">Comprar look completo</ion-button>
+      <ion-button expand="block" fill="outline" shape="round" (click)="shareLook()">Compartilhar look</ion-button>
+      <ion-button expand="block" fill="outline" shape="round" [disabled]="publishing" (click)="togglePublication()">
+        {{ publishing ? 'Atualizando...' : (look.isPublished ? 'Ocultar da vitrine' : 'Publicar no perfil') }}
+      </ion-button>
+    </section>
+
+    <section class="editorial-card card-shell">
+      <div class="section-copy">
+        <span class="eyebrow">Closet editorial</span>
+        <h2>Ajuste o nome final do look</h2>
+        <p>Refine a descricao do look salvo sem precisar voltar ao studio.</p>
+      </div>
+
+      <ion-item lines="none" class="editorial-field">
+        <ion-label position="stacked">Nome do look</ion-label>
+        <ion-input [(ngModel)]="editableName" maxlength="80" placeholder="Ex.: Casual urbano de domingo"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="editorial-field">
+        <ion-label position="stacked">Nota curta</ion-label>
+        <ion-textarea
+          [(ngModel)]="editableNote"
+          auto-grow="true"
+          maxlength="220"
+          placeholder="Descreva o mood desse look ou o contexto de uso."
+        ></ion-textarea>
+      </ion-item>
+
+      <ion-item lines="none" class="editorial-field">
+        <ion-label position="stacked">Tags de ocasiao</ion-label>
+        <ion-input [(ngModel)]="editableTags" placeholder="Trabalho, jantar, fim de semana"></ion-input>
+      </ion-item>
+
+      <div class="editorial-tags" *ngIf="parsedTags.length > 0">
+        <span *ngFor="let tag of parsedTags">{{ tag }}</span>
+      </div>
+
+      <ion-button
+        expand="block"
+        shape="round"
+        [disabled]="!hasDetailChanges || !editableName.trim() || savingDetails"
+        (click)="saveDetails()">
+        {{ savingDetails ? 'Salvando...' : 'Salvar ajustes do look' }}
+      </ion-button>
+    </section>
+
+    <section class="purchase-card card-shell" *ngIf="purchaseGroups.length > 0">
+      <div class="section-copy">
+        <span class="eyebrow">Compra externa</span>
+        <h2>Revise por loja antes de abrir os links</h2>
+        <p>O app organiza as pecas por loja para deixar a jornada final mais clara.</p>
+      </div>
+
+      <div class="purchase-groups">
+        <article class="purchase-group" *ngFor="let group of purchaseGroups; trackBy: trackByStore">
+          <div class="group-copy">
+            <span>{{ group.items.length }} pecas</span>
+            <h3>{{ group.name }}</h3>
+            <p>{{ group.subtotal | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</p>
+          </div>
+          <div class="group-tags">
+            <span *ngFor="let item of group.items">{{ item.category }}</span>
+          </div>
+          <ion-button expand="block" fill="clear" (click)="openStore(group.url)">Abrir loja</ion-button>
+        </article>
+      </div>
+    </section>
+
+    <section class="items-section">
+      <div class="section-copy">
+        <span class="eyebrow">Pecas do look</span>
+        <h2>Vitrine final</h2>
+      </div>
+
+      <section class="items-grid">
+        <article class="item-card card-shell" *ngFor="let item of look.items">
+          <img [src]="item.imageUrl" [alt]="item.name">
+          <div class="item-copy">
+            <span>{{ item.category }} / {{ item.color }}</span>
+            <h2>{{ item.name }}</h2>
+            <p>{{ item.storeName }}</p>
+            <strong>{{ item.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+          </div>
+          <ion-button expand="block" fill="outline" (click)="openStore(item.productUrl)">Ir para a loja</ion-button>
+        </article>
+      </section>
+    </section>
+  </div>
+</ion-content>

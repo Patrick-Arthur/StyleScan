@@ -1,0 +1,11 @@
+{
+  "framework": "angular",
+  "buildCommand": "npm run build:public",
+  "outputDirectory": "www",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

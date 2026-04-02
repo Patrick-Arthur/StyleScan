@@ -1,0 +1,37 @@
+<ion-content [fullscreen]="true" class="showcase-shell">
+  <div class="state-card" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando vitrine publica...</p>
+  </div>
+
+  <div class="state-card error" *ngIf="error && !loading">
+    <p>{{ error }}</p>
+  </div>
+
+  <div class="showcase-page" *ngIf="profile && !loading">
+    <section class="showcase-hero card-shell">
+      <span class="eyebrow">StyleScan Showcase</span>
+      <h1>{{ profile.displayName }}</h1>
+      <p>{{ profile.bio || 'Selecao publica de looks criados para provar, compartilhar e comprar.' }}</p>
+      <div class="hero-pills">
+        <span>{{ profile.publishedLooksCount }} looks publicados</span>
+        <span>@{{ profile.publicProfileSlug }}</span>
+      </div>
+    </section>
+
+    <section class="showcase-grid">
+      <article class="showcase-card card-shell" *ngFor="let look of profile.looks">
+        <img [src]="look.heroImageUrl || '/assets/icon/favicon.png'" [alt]="look.name">
+        <div class="showcase-copy">
+          <span>{{ look.style }} / {{ look.occasion }}</span>
+          <h2>{{ look.name }}</h2>
+          <p>{{ look.note || 'Look publicado na vitrine do StyleScan.' }}</p>
+          <div class="tag-row" *ngIf="look.occasionTags.length > 0">
+            <span *ngFor="let tag of look.occasionTags">{{ tag }}</span>
+          </div>
+        </div>
+        <ion-button expand="block" shape="round" (click)="openLook(look.shareSlug)">Abrir look</ion-button>
+      </article>
+    </section>
+  </div>
+</ion-content>

@@ -1,0 +1,237 @@
+﻿<ion-content [fullscreen]="true" class="home-shell">
+  <div class="home-page" *ngIf="!loading; else loadingState">
+    <div *ngIf="!error; else errorState" class="home-stack">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <span class="eyebrow">StyleScan Home</span>
+          <h1>Seu provador de estilo comeca aqui.</h1>
+          <p>
+            Acompanhe o avatar principal, navegue pelos looks salvos e entre no studio para testar pecas com uma
+            jornada mais proxima de um app fashion real.
+          </p>
+
+          <div class="hero-pills">
+            <div class="hero-pill accent">
+              <span>Conta</span>
+              <strong>{{ user?.email }}</strong>
+            </div>
+            <div class="hero-pill">
+              <span>Avatar principal</span>
+              <strong>{{ primaryAvatar?.name || 'Ainda nao criado' }}</strong>
+            </div>
+            <div class="hero-pill dark">
+              <span>Looks</span>
+              <strong>{{ lookCountLabel }}</strong>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <ion-button expand="block" shape="round" (click)="navigate(primaryAvatar ? '/looks/list' : '/avatar/create')">
+              {{ primaryAvatar ? 'Abrir studio de looks' : 'Criar primeiro avatar' }}
+            </ion-button>
+            <ion-button expand="block" fill="outline" shape="round" (click)="navigate('/shop/list')">
+              Explorar loja premium
+            </ion-button>
+          </div>
+        </div>
+
+        <div class="hero-visual card-shell">
+          <div class="visual-header">
+            <div>
+              <span class="eyebrow">Avatar Spotlight</span>
+              <h2>{{ primaryAvatar?.name || firstName }}</h2>
+            </div>
+            <button type="button" class="ghost-link" (click)="navigate(primaryAvatar ? '/avatar/list' : '/avatar/create')">
+              {{ primaryAvatar ? 'Editar' : 'Criar' }}
+            </button>
+          </div>
+
+          <div class="visual-stage" [class.has-avatar]="!!primaryAvatarImageUrl">
+            <ng-container *ngIf="primaryAvatarImageUrl; else avatarFallback">
+              <img [src]="primaryAvatarImageUrl" [alt]="primaryAvatar?.name || 'Avatar'" />
+            </ng-container>
+            <ng-template #avatarFallback>
+              <div class="avatar-fallback">
+                <ion-icon name="sparkles-outline"></ion-icon>
+                <strong>Seu avatar aparece aqui</strong>
+                <span>Adicione fotos e gere uma base 2D para vestir seus looks.</span>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="visual-metrics">
+            <div class="metric-chip">
+              <span>Leitura atual</span>
+              <strong>{{ avatarSummary }}</strong>
+            </div>
+            <div class="metric-row" *ngIf="primaryAvatar; else emptyAvatarMetrics">
+              <span>Altura {{ primaryAvatar.height }} cm</span>
+              <span>Torax {{ primaryAvatar.chest }} cm</span>
+              <span>Cintura {{ primaryAvatar.waist }} cm</span>
+              <span>Quadril {{ primaryAvatar.hips }} cm</span>
+            </div>
+            <ng-template #emptyAvatarMetrics>
+              <div class="empty-inline">
+                <span>Sem medidas cadastradas ainda.</span>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="card-shell story-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Rotina rapida</span>
+              <h2>Entradas principais</h2>
+            </div>
+          </div>
+
+          <div class="quick-grid">
+            <button
+              type="button"
+              class="quick-card"
+              *ngFor="let action of quickActions"
+              (click)="navigate(action.route)">
+              <div class="quick-icon">
+                <ion-icon [name]="action.icon"></ion-icon>
+              </div>
+              <strong>{{ action.label }}</strong>
+              <span>Ir agora</span>
+            </button>
+          </div>
+        </article>
+
+        <article class="card-shell account-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Conta autenticada</span>
+              <h2>{{ firstName }}, deixe o app mais pessoal.</h2>
+            </div>
+          </div>
+
+          <p>
+            Atualize perfil, refine o avatar e mantenha a base pronta para um provador cada vez mais fiel.
+          </p>
+
+          <div class="account-actions">
+            <ion-button fill="clear" (click)="navigate('/user/profile')">Editar perfil</ion-button>
+            <ion-button color="dark" fill="clear" (click)="logout()">Sair</ion-button>
+          </div>
+        </article>
+      </section>
+
+      <section class="card-shell gamification-card" *ngIf="gamification">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Progresso de estilo</span>
+            <h2>Nivel {{ gamification.currentLevel }} / {{ gamification.momentumLabel }}</h2>
+          </div>
+        </div>
+
+        <div class="gamification-topline">
+          <div class="metric-chip">
+            <span>XP acumulado</span>
+            <strong>{{ gamification.experiencePoints }} pts</strong>
+          </div>
+          <div class="metric-chip">
+            <span>Proximo nivel</span>
+            <strong>{{ gamification.nextLevelPoints }} pts</strong>
+          </div>
+        </div>
+
+        <div class="usage-bar gamification-progress">
+          <span [style.width.%]="gamification.progressPercent"></span>
+        </div>
+
+        <div class="badge-row" *ngIf="gamification.badges.length > 0">
+          <article class="badge-card" *ngFor="let badge of gamification.badges | slice:0:3">
+            <ion-icon [name]="badge.icon"></ion-icon>
+            <div>
+              <strong>{{ badge.title }}</strong>
+              <p>{{ badge.description }}</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="mission-grid" *ngIf="missionPreview.length > 0">
+          <article class="mission-card" *ngFor="let mission of missionPreview">
+            <div class="mission-copy">
+              <strong>{{ mission.title }}</strong>
+              <p>{{ mission.description }}</p>
+            </div>
+            <div class="mission-meta">
+              <span>{{ mission.progress }}/{{ mission.goal }}</span>
+              <strong>+{{ mission.rewardPoints }} XP</strong>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <article class="card-shell looks-card">
+          <div class="section-head with-action">
+            <div>
+              <span class="eyebrow">Looks recentes</span>
+              <h2>Galeria pessoal</h2>
+            </div>
+            <button type="button" class="ghost-link" (click)="navigate('/looks/list')">Ver studio</button>
+          </div>
+
+          <div *ngIf="recentLooks.length > 0; else noLooks" class="looks-grid">
+            <article class="look-tile" *ngFor="let look of recentLooks" (click)="navigate('/looks/list')">
+              <div class="look-hero" *ngIf="look.heroImageUrl">
+                <img [src]="look.heroImageUrl" [alt]="look.name">
+              </div>
+              <div class="look-topline">
+                <span>{{ look.occasion }}</span>
+                <strong>{{ look.totalPrice | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+              </div>
+              <h3>{{ look.name }}</h3>
+              <p>{{ look.style }}</p>
+              <div class="look-collections" *ngIf="look.collections?.length">
+                <span *ngFor="let collection of look.collections">{{ collection }}</span>
+              </div>
+              <div class="look-footer">
+                <span>Toque para revisar o conjunto</span>
+              </div>
+            </article>
+          </div>
+
+          <ng-template #noLooks>
+            <div class="empty-state-card">
+              <p>Voce ainda nao tem looks salvos. Entre no studio para vestir o avatar e montar os primeiros conjuntos.</p>
+              <ion-button fill="outline" shape="round" (click)="navigate('/looks/list')">Ir para looks</ion-button>
+            </div>
+          </ng-template>
+        </article>
+
+        <article class="insight-column">
+          <article class="card-shell insight-card" *ngFor="let card of focusCards" (click)="navigate(card.route)">
+            <div class="insight-icon">
+              <ion-icon [name]="card.icon"></ion-icon>
+            </div>
+            <span class="eyebrow">{{ card.eyebrow }}</span>
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.text }}</p>
+          </article>
+        </article>
+      </section>
+    </div>
+  </div>
+
+  <ng-template #loadingState>
+    <div class="feedback-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando sua Home...</p>
+    </div>
+  </ng-template>
+
+  <ng-template #errorState>
+    <div class="feedback-state error">
+      <p>{{ error }}</p>
+      <ion-button fill="outline" (click)="loadDashboard()">Tentar novamente</ion-button>
+    </div>
+  </ng-template>
+</ion-content>

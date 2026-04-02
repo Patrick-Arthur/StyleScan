@@ -1,0 +1,47 @@
+<ion-content [fullscreen]="true" class="result-shell">
+  <div class="result-page">
+    <section class="result-card card-shell">
+      <span class="eyebrow">Retorno do checkout</span>
+      <h1>{{ title }}</h1>
+      <p>{{ description }}</p>
+
+      <div class="result-meta">
+        <div class="meta-row">
+          <span>Status</span>
+          <strong>{{ status }}</strong>
+        </div>
+        <div class="meta-row">
+          <span>Plano</span>
+          <strong>{{ planId }}</strong>
+        </div>
+        <div class="meta-row">
+          <span>Checkout</span>
+          <strong>{{ checkoutId || 'Nao informado' }}</strong>
+        </div>
+      </div>
+
+      <div class="feedback-chip success" *ngIf="success">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>{{ success }}</span>
+      </div>
+
+      <div class="feedback-chip error" *ngIf="error">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ error }}</span>
+      </div>
+
+      <div class="result-actions">
+        <ion-button *ngIf="status === 'approved' && !success" expand="block" shape="round" [disabled]="confirming" (click)="confirmFromReturn()">
+          <ion-icon slot="start" name="diamond-outline"></ion-icon>
+          {{ confirming ? 'Ativando plano...' : 'Concluir ativacao do plano' }}
+        </ion-button>
+        <ion-button fill="outline" expand="block" shape="round" (click)="goToProfile()">
+          Ir para perfil
+        </ion-button>
+        <ion-button fill="clear" expand="block" shape="round" (click)="goToUpgrade()">
+          Voltar aos planos
+        </ion-button>
+      </div>
+    </section>
+  </div>
+</ion-content>

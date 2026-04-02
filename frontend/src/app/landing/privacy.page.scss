@@ -1,0 +1,80 @@
+.legal-shell {
+  --background:
+    radial-gradient(circle at top left, rgba(156, 229, 244, 0.22), transparent 26%),
+    linear-gradient(180deg, #f6fbfc 0%, #edf5f7 100%);
+}
+
+.legal-page {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 24px 18px 48px;
+  display: grid;
+  gap: 16px;
+}
+
+.legal-card {
+  padding: 24px;
+  border-radius: 28px;
+  border: 1px solid rgba(18, 42, 52, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 40px rgba(18, 42, 52, 0.08);
+}
+
+.legal-hero {
+  background:
+    radial-gradient(circle at top right, rgba(156, 229, 244, 0.32), transparent 28%),
+    linear-gradient(145deg, rgba(10, 23, 31, 0.98), rgba(21, 48, 60, 0.92));
+  color: #f5fbfc;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(245, 251, 252, 0.84);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.legal-card h1,
+.legal-card h2 {
+  margin: 0 0 12px;
+  color: #172833;
+}
+
+.legal-hero h1,
+.legal-hero p {
+  color: #f5fbfc;
+}
+
+.legal-card p {
+  margin: 0 0 12px;
+  line-height: 1.7;
+  color: #4d616b;
+}
+
+.legal-footer {
+  display: grid;
+  gap: 16px;
+}
+
+.legal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.legal-actions ion-button:last-child {
+  --background: linear-gradient(135deg, #10252d, #214b57);
+  --color: #f5fbfc;
+}
+
+@media (min-width: 768px) {
+  .legal-page {
+    padding: 28px 24px 60px;
+  }
+}

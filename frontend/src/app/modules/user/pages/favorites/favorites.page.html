@@ -1,0 +1,88 @@
+﻿<ion-content [fullscreen]="true" class="favorites-shell">
+  <div class="favorites-page">
+    <section class="page-hero card-shell">
+      <div>
+        <span class="eyebrow">Favorites</span>
+        <h1>Looks que merecem voltar para o studio.</h1>
+        <p>Reveja seus conjuntos favoritos, abra o detalhe ou remova o que nao faz mais sentido.</p>
+      </div>
+    </section>
+
+    <section class="favorites-filters card-shell" *ngIf="favoriteLooks.length > 0">
+      <ion-item class="filter-field" lines="none">
+        <ion-label position="stacked">Buscar favoritos</ion-label>
+        <ion-input [(ngModel)]="searchTerm" placeholder="Nome, estilo ou tag"></ion-input>
+      </ion-item>
+
+      <div class="collection-rail">
+        <button type="button" class="collection-chip" [class.active]="selectedCollection === 'all'" (click)="selectedCollection = 'all'">
+          Todos
+        </button>
+        <button type="button" class="collection-chip collection-chip-manual" *ngFor="let collection of manualCollections" [class.active]="selectedCollection === 'manual:' + collection.id" (click)="selectedCollection = 'manual:' + collection.id">
+          {{ collection.label }} <span>{{ collection.looks.length }}</span>
+        </button>
+        <button type="button" class="collection-chip" *ngFor="let collection of collections" [class.active]="selectedCollection === collection.id" (click)="selectedCollection = collection.id">
+          {{ collection.label }} <span>{{ collection.looks.length }}</span>
+        </button>
+      </div>
+
+      <div class="manual-collection-toolbar" *ngIf="selectedManualCollection">
+        <div>
+          <span class="eyebrow">Colecao manual</span>
+          <h3>{{ selectedManualCollection.label }}</h3>
+          <p>{{ selectedManualCollection.looks.length }} look(s) nesta colecao.</p>
+        </div>
+        <div class="manual-collection-toolbar-actions">
+          <ion-button fill="outline" size="small" (click)="renameSelectedCollection()">Renomear</ion-button>
+          <ion-button color="danger" fill="clear" size="small" (click)="deleteSelectedCollection()">Excluir</ion-button>
+        </div>
+      </div>
+    </section>
+
+    <section class="favorites-grid" *ngIf="filteredFavoriteLooks.length > 0; else emptyState">
+      <article class="favorite-card card-shell" *ngFor="let look of filteredFavoriteLooks">
+        <div class="favorite-hero" *ngIf="look.heroImageUrl">
+          <img [src]="look.heroImageUrl" [alt]="look.name">
+        </div>
+        <div class="favorite-topline">
+          <span>{{ look.occasion }} / {{ look.style }}</span>
+          <button type="button" class="remove-link" (click)="removeFavorite(look.id)">Remover</button>
+        </div>
+        <h2>{{ look.name }}</h2>
+        <p *ngIf="look.note">{{ look.note }}</p>
+        <p>{{ look.totalPrice | currencyFormat }}</p>
+        <div class="tag-row" *ngIf="look.occasionTags.length > 0">
+          <span *ngFor="let tag of look.occasionTags">{{ tag }}</span>
+        </div>
+        <div class="favorite-actions">
+          <ion-button fill="clear" size="small" (click)="addLookToCollection(look)">Coleção</ion-button>
+          <ion-button fill="outline" size="small" (click)="viewLookDetail(look.id)">Ver detalhe</ion-button>
+          <ion-button size="small" (click)="viewLookDetail(look.id)">Abrir look</ion-button>
+        </div>
+        <div class="manual-collections" *ngIf="manualCollections.length > 0">
+          <button
+            type="button"
+            class="manual-collection-pill"
+            *ngFor="let collection of manualCollections"
+            [class.visible]="isLookInCollection(look.id, collection.id)"
+            (click)="removeLookFromCollection(look.id, collection.id)">
+            <ng-container *ngIf="isLookInCollection(look.id, collection.id)">
+              {{ collection.label }} ×
+            </ng-container>
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <ng-template #emptyState>
+      <div class="empty-state card-shell">
+        <div class="empty-icon">
+          <ion-icon name="heart-outline"></ion-icon>
+        </div>
+        <h2>{{ favoriteLooks.length > 0 ? 'Nenhum look encontrado' : 'Nenhum favorito salvo' }}</h2>
+        <p>{{ favoriteLooks.length > 0 ? 'Tente trocar a colecao ou limpar a busca para reencontrar seus looks.' : 'Quando voce favoritar looks marcantes, eles aparecem aqui para revisita rapida.' }}</p>
+        <ion-button shape="round" routerLink="/looks/list">Explorar looks</ion-button>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

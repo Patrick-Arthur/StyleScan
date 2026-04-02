@@ -1,0 +1,166 @@
+﻿<ion-content [fullscreen]="true" class="avatar-shell">
+  <div class="avatar-page">
+    <div class="feedback-card" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando avatar...</p>
+    </div>
+
+    <div class="feedback-card error" *ngIf="error && !loading">
+      <p>{{ error }}</p>
+    </div>
+
+    <form *ngIf="!loading && avatar" [formGroup]="avatarForm" (ngSubmit)="saveCustomization()" class="customize-form">
+      <section class="hero-grid">
+        <article class="card-shell preview-card">
+          <div class="preview-head">
+            <div>
+              <span class="eyebrow">Avatar Studio</span>
+              <h1>{{ avatar.name }}</h1>
+            </div>
+            <span class="status-chip">{{ avatar.bodyType }} • {{ avatar.skinTone }}</span>
+          </div>
+
+          <div class="avatar-viewer">
+            <img *ngIf="getAvatarImageUrl(); else emptyAvatarImage" [src]="getAvatarImageUrl()" alt="Foto-base do avatar">
+            <ng-template #emptyAvatarImage>
+              <div class="viewer-fallback">
+                <ion-icon name="body-outline"></ion-icon>
+                <strong>Seu avatar aparece aqui</strong>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="viewer-actions">
+            <label class="photo-picker compact">
+              <input type="file" accept="image/*" multiple (change)="onPhotoSelected($event)">
+              <ion-icon name="images-outline"></ion-icon>
+              <span>{{ updatingPhoto ? 'Atualizando fotos...' : 'Trocar fotos-base' }}</span>
+            </label>
+
+            <ion-button expand="block" fill="outline" shape="round" (click)="generateAvatar2d()" [disabled]="generatingAvatar2d">
+              {{ generatingAvatar2d ? 'Gerando avatar com IA...' : 'Gerar avatar 2D com IA' }}
+            </ion-button>
+          </div>
+
+          <div class="photo-gallery" *ngIf="photoGallery.length > 1">
+            <img *ngFor="let photo of photoGallery" [src]="photo" alt="Referencia do avatar">
+          </div>
+        </article>
+
+        <article class="card-shell side-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Leitura atual</span>
+              <h2>Resumo do perfil visual</h2>
+            </div>
+          </div>
+
+          <div class="metric-list">
+            <div class="metric-item">
+              <span>Altura</span>
+              <strong>{{ avatar.height }} cm</strong>
+            </div>
+            <div class="metric-item">
+              <span>Torax/Busto</span>
+              <strong>{{ avatar.chest }} cm</strong>
+            </div>
+            <div class="metric-item">
+              <span>Cintura</span>
+              <strong>{{ avatar.waist }} cm</strong>
+            </div>
+            <div class="metric-item">
+              <span>Quadril</span>
+              <strong>{{ avatar.hips }} cm</strong>
+            </div>
+          </div>
+
+          <p class="section-copy">
+            Ajuste esses dados para melhorar recomendacoes, try-on e a geracao de uma base visual mais fiel.
+          </p>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="card-shell details-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Detalhes principais</span>
+              <h2>Identidade do avatar</h2>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <label class="field-card field-card-full">
+              <span>Nome</span>
+              <ion-input formControlName="name"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Genero base</span>
+              <ion-select formControlName="gender">
+                <ion-select-option value="female">Feminino</ion-select-option>
+                <ion-select-option value="male">Masculino</ion-select-option>
+                <ion-select-option value="other">Outro</ion-select-option>
+              </ion-select>
+            </label>
+            <label class="field-card">
+              <span>Tipo de corpo</span>
+              <ion-select formControlName="bodyType">
+                <ion-select-option value="slim">Estrutura leve</ion-select-option>
+                <ion-select-option value="athletic">Estrutura atletica</ion-select-option>
+                <ion-select-option value="average">Estrutura equilibrada</ion-select-option>
+                <ion-select-option value="curvy">Estrutura suave</ion-select-option>
+              </ion-select>
+            </label>
+            <div class="field-card field-card-full tone-card">
+              <span>Tom de pele</span>
+              <ion-segment formControlName="skinTone">
+                <ion-segment-button value="light">Claro</ion-segment-button>
+                <ion-segment-button value="medium">Medio</ion-segment-button>
+                <ion-segment-button value="dark">Profundo</ion-segment-button>
+              </ion-segment>
+            </div>
+          </div>
+        </article>
+
+        <article class="card-shell measure-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Medidas</span>
+              <h2>Ajustes finos</h2>
+            </div>
+          </div>
+
+          <div class="field-grid measure-grid">
+            <label class="field-card">
+              <span>Altura (cm)</span>
+              <ion-input type="number" formControlName="height"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Torax/Busto (cm)</span>
+              <ion-input type="number" formControlName="chest"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Cintura (cm)</span>
+              <ion-input type="number" formControlName="waist"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Quadril (cm)</span>
+              <ion-input type="number" formControlName="hips"></ion-input>
+            </label>
+          </div>
+        </article>
+      </section>
+
+      <div class="page-actions">
+        <ion-button expand="block" shape="round" type="submit" [disabled]="avatarForm.invalid || saving">
+          <ion-icon slot="start" name="save-outline"></ion-icon>
+          {{ saving ? 'Salvando...' : 'Salvar personalizacao' }}
+        </ion-button>
+        <ion-button expand="block" fill="outline" shape="round" (click)="resetCustomization()" type="button">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Restaurar valores
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

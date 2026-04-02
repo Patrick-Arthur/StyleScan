@@ -1,0 +1,141 @@
+<ion-content [fullscreen]="true" class="upgrade-shell">
+  <div class="upgrade-page">
+    <section class="upgrade-hero card-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">Upgrade de conta</span>
+        <h1>Escolha um plano para liberar mais acoes dentro do StyleScan</h1>
+        <p>
+          A ideia aqui e visualizar como a jornada premium pode funcionar: mais avatares, mais provas,
+          mais imagens realistas e mais espaco para salvar looks.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <ion-button fill="outline" shape="round" (click)="goBack()">
+          <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+          Voltar ao perfil
+        </ion-button>
+      </div>
+    </section>
+
+    <section class="current-plan card-shell">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Plano atual</span>
+          <h2>{{ currentPlan.name }}</h2>
+        </div>
+        <span class="plan-badge">Ativo hoje</span>
+      </div>
+
+      <p>{{ currentPlan.summary }}</p>
+
+      <div class="current-limit-grid">
+        <div class="current-limit" *ngFor="let limit of currentPlanLimits">
+          <ion-icon name="ellipse-outline"></ion-icon>
+          <span>{{ limit }}</span>
+        </div>
+      </div>
+
+      <div class="usage-board" *ngIf="usageRows.length > 0">
+        <div class="usage-row" *ngFor="let row of usageRows">
+          <div class="usage-copy">
+            <strong>{{ row.label }}</strong>
+            <span>{{ row.detail }}</span>
+          </div>
+          <div class="usage-bar">
+            <span [style.width.%]="row.progress"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="feedback-chip error" *ngIf="error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <div class="feedback-chip success" *ngIf="success">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <span>{{ success }}</span>
+    </div>
+
+    <section class="plans-grid">
+      <article
+        class="plan-card card-shell"
+        *ngFor="let plan of plans"
+        [class.featured]="plan.featured"
+        [class.is-soft]="plan.accent === 'soft'"
+        [class.is-aqua]="plan.accent === 'aqua'"
+        [class.is-midnight]="plan.accent === 'midnight'"
+      >
+        <div class="plan-topline">
+          <span class="ribbon" *ngIf="plan.ribbon">{{ plan.ribbon }}</span>
+          <span class="plan-type">{{ plan.name }}</span>
+        </div>
+
+        <div class="plan-price">
+          <strong>{{ plan.price }}</strong>
+          <span>{{ plan.cadence }}</span>
+        </div>
+
+        <p class="plan-summary">{{ plan.summary }}</p>
+
+        <div class="limit-board">
+          <div class="limit-row" *ngFor="let limit of plan.limits">
+            <span>{{ limit.label }}</span>
+            <strong>{{ limit.value }}</strong>
+          </div>
+        </div>
+
+        <div class="perk-list">
+          <div class="perk-item" *ngFor="let perk of plan.perks">
+            <ion-icon name="sparkles-outline"></ion-icon>
+            <span>{{ perk }}</span>
+          </div>
+        </div>
+
+        <ion-button
+          expand="block"
+          shape="round"
+          [disabled]="switchingPlanId !== null"
+          [fill]="isCurrentPlan(plan.id) || plan.featured ? 'solid' : 'outline'"
+          (click)="choosePlan(plan.id)"
+        >
+          {{
+            switchingPlanId === plan.id
+              ? 'Preparando checkout...'
+              : (isCurrentPlan(plan.id) ? 'Plano ativo na conta' : 'Ir para checkout')
+          }}
+        </ion-button>
+      </article>
+    </section>
+
+    <section class="limits-explainer card-shell">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Acoes que podem ser limitadas</span>
+          <h2>Base inicial para o modelo free x premium</h2>
+        </div>
+      </div>
+
+      <div class="explainer-grid">
+        <div class="explainer-item">
+          <strong>Avatares</strong>
+          <span>Quantidade de perfis visuais que o usuario pode manter ativos.</span>
+        </div>
+        <div class="explainer-item">
+          <strong>Provas no avatar</strong>
+          <span>Numero de testes de roupas no studio usando o avatar do app.</span>
+        </div>
+        <div class="explainer-item">
+          <strong>Fotos realistas</strong>
+          <span>Geracoes mais custosas com IA usando as fotos reais da pessoa como base.</span>
+        </div>
+        <div class="explainer-item">
+          <strong>Looks salvos</strong>
+          <span>Capacidade de manter colecoes pessoais e historico no aplicativo.</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</ion-content>

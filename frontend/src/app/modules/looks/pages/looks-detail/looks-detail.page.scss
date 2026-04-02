@@ -1,0 +1,256 @@
+﻿.detail-shell {
+  --background: linear-gradient(180deg, #f4fbfc 0%, #edf6f8 48%, #f7fbfb 100%);
+}
+
+.detail-page {
+  padding: 22px 18px 120px;
+}
+
+.card-shell,
+.purchase-group {
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(23, 37, 45, 0.08);
+  box-shadow: 0 18px 36px rgba(19, 39, 48, 0.08);
+}
+
+.hero-card,
+.actions-card,
+.purchase-card,
+.item-card {
+  padding: 18px;
+}
+
+.eyebrow,
+.item-copy span,
+.group-copy span {
+  color: #6a7b82;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-card h1,
+.section-copy h2,
+.item-copy h2,
+.group-copy h3 {
+  margin: 10px 0 0;
+  color: #15252d;
+}
+
+.hero-card p,
+.section-copy p,
+.item-copy p,
+.feedback-state p {
+  margin: 12px 0 0;
+  color: #54676f;
+}
+
+.hero-collage,
+.purchase-groups,
+.items-grid,
+.quick-actions {
+  display: grid;
+  gap: 14px;
+}
+
+.hero-collage {
+  grid-template-columns: 1.35fr 0.85fr 0.85fr;
+  margin-bottom: 18px;
+}
+
+.hero-collage img,
+.item-card img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.hero-collage img {
+  height: 110px;
+  border-radius: 18px;
+}
+
+.hero-collage img:first-child {
+  grid-row: span 2;
+  height: 234px;
+}
+
+.hero-meta,
+.group-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hero-meta {
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.hero-note {
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.hero-tags span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(43, 130, 149, 0.12);
+  color: #225a67;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.hero-collections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.publication-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(21, 37, 45, 0.08);
+  color: #3b5560;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.publication-badge.is-live {
+  background: rgba(56, 173, 123, 0.12);
+  color: #1a7a55;
+}
+
+.collection-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(22, 36, 46, 0.08);
+  color: #34545f;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 0;
+}
+
+.collection-action {
+  margin-top: 14px;
+}
+
+.hero-meta strong,
+.item-copy strong,
+.group-copy h3 {
+  color: #15252d;
+}
+
+.editorial-card {
+  margin-top: 16px;
+}
+
+.editorial-field {
+  --background: rgba(245, 250, 251, 0.9);
+  --border-radius: 18px;
+  margin-top: 12px;
+}
+
+.editorial-field ion-label {
+  margin-bottom: 8px;
+  color: #4f6670;
+  font-weight: 600;
+}
+
+.editorial-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1rem 0 1.1rem;
+}
+
+.editorial-tags span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(43, 130, 149, 0.12);
+  color: #225a67;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.purchase-card,
+.items-section,
+.items-grid {
+  margin-top: 16px;
+}
+
+.purchase-group {
+  padding: 14px;
+}
+
+.group-tags span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eff6f7;
+  color: #28444f;
+  font-size: 0.82rem;
+}
+
+.item-card {
+  overflow: hidden;
+  padding-bottom: 14px;
+}
+
+.item-card img {
+  height: 180px;
+  border-radius: 18px;
+}
+
+.item-copy {
+  padding-top: 14px;
+}
+
+.item-card ion-button {
+  margin-top: 12px;
+}
+
+.feedback-state {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+}
+
+@media (min-width: 768px) {
+  .detail-page {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-top: 32px;
+  }
+
+  .quick-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .purchase-groups,
+  .items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

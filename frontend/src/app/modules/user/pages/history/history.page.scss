@@ -1,0 +1,139 @@
+﻿.history-shell {
+  --background:
+    radial-gradient(circle at top left, rgba(156, 229, 244, 0.28), transparent 28%),
+    linear-gradient(180deg, #f6fbfc 0%, #edf7f9 50%, #f8fbfc 100%);
+}
+
+.history-page {
+  padding: 22px 18px 118px;
+  display: grid;
+  gap: 18px;
+}
+
+.card-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(17, 34, 47, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 18px 40px rgba(19, 39, 48, 0.08);
+}
+
+.eyebrow {
+  display: inline-block;
+  color: #71838c;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.page-hero,
+.history-card,
+.empty-state {
+  padding: 22px;
+}
+
+.page-hero h1,
+.history-card h2,
+.empty-state h2 {
+  margin: 12px 0 0;
+  color: #16242e;
+}
+
+.page-hero p,
+.history-card p,
+.empty-state p {
+  margin: 12px 0 0;
+  color: #52676f;
+  line-height: 1.6;
+}
+
+.history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.history-hero {
+  margin-bottom: 14px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(236, 244, 246, 0.96), rgba(227, 238, 241, 0.98));
+}
+
+.history-hero img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  display: block;
+}
+
+.history-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-topline span {
+  display: inline-flex;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(156, 229, 244, 0.22);
+  color: #2a6674;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.history-card.recent {
+  border-color: rgba(43, 130, 149, 0.28);
+  box-shadow: 0 22px 40px rgba(43, 130, 149, 0.12);
+}
+
+.recent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(40, 163, 112, 0.12);
+  color: #197453;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: rgba(156, 229, 244, 0.24);
+  color: #2b8295;
+}
+
+.empty-icon ion-icon {
+  font-size: 1.8rem;
+}
+
+@media (min-width: 768px) {
+  .history-page {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-top: 30px;
+  }
+
+  .history-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

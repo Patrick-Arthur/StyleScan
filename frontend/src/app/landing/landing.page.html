@@ -1,0 +1,162 @@
+<ion-content [fullscreen]="true" class="landing-shell">
+  <div class="landing-page">
+    <section class="status-banner card-shell" *ngIf="paymentStatus">
+      <span class="eyebrow">Mercado Pago</span>
+      <h2 *ngIf="paymentStatus === 'success'">Pagamento concluido</h2>
+      <h2 *ngIf="paymentStatus === 'pending'">Pagamento pendente</h2>
+      <h2 *ngIf="paymentStatus === 'failure'">Pagamento nao concluido</h2>
+      <p>{{ paymentMessage }}</p>
+    </section>
+
+    <section class="hero card-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">StyleScan Publisher Overview</span>
+        <h1>Descoberta de moda, curadoria visual e jornada de compra assistida em um app mobile-first.</h1>
+        <p>
+          O StyleScan e uma plataforma mobile-first de fashion discovery que ajuda usuarios a explorar
+          roupas, calcados e acessorios, montar looks, testar combinacoes e seguir para a compra em
+          parceiros e varejistas externos.
+        </p>
+
+        <div class="hero-actions">
+          <ion-button shape="round" (click)="goToRegister()">
+            <ion-icon slot="start" name="sparkles-outline"></ion-icon>
+            Criar conta
+          </ion-button>
+          <ion-button fill="outline" shape="round" (click)="goToLogin()">
+            Entrar no app
+          </ion-button>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-card">
+          <span>Produto</span>
+          <strong>Plataforma de descoberta e curadoria de moda</strong>
+        </div>
+        <div class="hero-card">
+          <span>Categoria</span>
+          <strong>Vestuario, calcados e acessorios</strong>
+        </div>
+        <div class="hero-card">
+          <span>Modelo de operacao</span>
+          <strong>Curadoria editorial, provador visual e checkout realizado em parceiros externos</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <article class="card-shell overview-card">
+        <div class="section-head">
+          <span class="eyebrow">Visao geral</span>
+          <h2>Uma experiencia de moda guiada por estilo, contexto e decisao visual</h2>
+        </div>
+
+        <div class="bullet-grid">
+          <div class="bullet-card" *ngFor="let item of highlights">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>{{ item }}</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card-shell audience-card">
+        <div class="section-head">
+          <span class="eyebrow">Publico e proposta</span>
+          <h2>Feito para consumidores que buscam mais confianca antes de comprar</h2>
+        </div>
+        <p>
+          O StyleScan atende usuarios interessados em moda, inspiração visual, comparacao de pecas
+          e exploracao de looks. A proposta do produto e reduzir atrito na descoberta e apoiar uma
+          jornada mais clara entre inspiracao, selecao de produtos e redirecionamento para compra.
+        </p>
+      </article>
+    </section>
+
+    <section class="journey card-shell">
+      <div class="section-head">
+        <span class="eyebrow">Jornada principal</span>
+        <h2>Como o usuário navega da descoberta ate a decisão de compra</h2>
+      </div>
+
+      <div class="step-grid">
+        <article class="step-card" *ngFor="let step of steps; let index = index">
+          <span class="step-index">0{{ index + 1 }}</span>
+          <strong>{{ step.title }}</strong>
+          <p>{{ step.description }}</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-grid">
+      <article class="card-shell trust-card">
+        <div class="section-head">
+          <span class="eyebrow">Parcerias e operacao</span>
+          <h2>Base institucional pensada para afiliacao, pagamentos e integrações comerciais</h2>
+        </div>
+
+        <div class="trust-list">
+          <div class="trust-item" *ngFor="let item of trustPoints">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            <span>{{ item }}</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card-shell contact-card">
+        <div class="section-head">
+          <span class="eyebrow">Informações do projeto</span>
+          <h2>Dados institucionais para parceiros e plataformas</h2>
+        </div>
+
+        <div class="contact-list">
+          <div class="contact-row">
+            <span>Produto</span>
+            <strong>StyleScan</strong>
+          </div>
+          <div class="contact-row">
+            <span>Modelo</span>
+            <strong>Aplicativo mobile-first com afiliacao e checkout externo</strong>
+          </div>
+          <div class="contact-row">
+            <span>E-mail</span>
+            <strong>patricksilva08@hotmail.com</strong>
+          </div>
+          <div class="contact-row">
+            <span>Status</span>
+            <strong>Produto em fase MVP com expansao comercial planejada</strong>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="footer-note card-shell">
+      <div>
+        <span class="eyebrow">Privacidade e experiencia</span>
+        <h2>Dados do usuario sao utilizados para personalização, organização visual e experiencias assistidas por IA.</h2>
+        <p>
+          Fotos, preferencias e informacoes de perfil sao utilizadas para melhorar recomendações,
+          avatar, provador visual e apresentação de produtos dentro da jornada do aplicativo.
+          A conclusão da compra ocorre em parceiros e varejistas externos.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <ion-button fill="outline" shape="round" (click)="goToLogin()">Entrar</ion-button>
+        <ion-button shape="round" (click)="goToRegister()">Comecar agora</ion-button>
+      </div>
+    </section>
+
+    <section class="legal-links card-shell">
+      <div>
+        <span class="eyebrow">Documentos públicos</span>
+        <h2>Base institucional para publicação e integrações.</h2>
+      </div>
+
+      <div class="hero-actions">
+        <ion-button fill="outline" shape="round" routerLink="/privacy">Politica de privacidade</ion-button>
+        <ion-button fill="outline" shape="round" routerLink="/terms">Termos de uso</ion-button>
+      </div>
+    </section>
+  </div>
+</ion-content>

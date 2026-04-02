@@ -1,0 +1,107 @@
+﻿<ion-content [fullscreen]="true" class="auth-shell">
+  <div class="auth-page register-page">
+    <section class="auth-hero card-shell">
+      <div>
+        <span class="eyebrow">StyleScan Join</span>
+        <h1>Crie sua conta e comece o provador.</h1>
+        <p>Seu perfil libera avatar, studio de looks, favoritos e uma jornada de compra mais pessoal.</p>
+      </div>
+      <div class="hero-badge">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </div>
+    </section>
+
+    <form [formGroup]="registerForm" (ngSubmit)="register()" class="auth-form card-shell">
+      <div class="form-head">
+        <span class="eyebrow">Cadastro</span>
+        <h2>Monte sua base inicial</h2>
+      </div>
+
+      <div class="field-grid">
+        <label class="field-card">
+          <span>Nome</span>
+          <ion-input type="text" formControlName="firstName" placeholder="Seu nome"></ion-input>
+        </label>
+        <label class="field-card">
+          <span>Sobrenome</span>
+          <ion-input type="text" formControlName="lastName" placeholder="Seu sobrenome"></ion-input>
+        </label>
+      </div>
+      <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="error-message">
+        <span>Nome e obrigatorio.</span>
+      </div>
+      <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="error-message">
+        <span>Sobrenome e obrigatorio.</span>
+      </div>
+
+      <label class="field-card">
+        <span>Email</span>
+        <ion-input type="email" formControlName="email" placeholder="voce@email.com"></ion-input>
+      </label>
+      <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
+        <span *ngIf="registerForm.get('email')?.errors?.['required']">Email e obrigatorio.</span>
+        <span *ngIf="registerForm.get('email')?.errors?.['email']">Email invalido.</span>
+      </div>
+
+      <div class="field-grid">
+        <label class="field-card">
+          <span>Senha</span>
+          <ion-input type="password" formControlName="password" placeholder="Crie uma senha"></ion-input>
+        </label>
+        <label class="field-card">
+          <span>Confirmar senha</span>
+          <ion-input type="password" formControlName="confirmPassword" placeholder="Repita a senha"></ion-input>
+        </label>
+      </div>
+      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
+        <span *ngIf="registerForm.get('password')?.errors?.['required']">Senha e obrigatoria.</span>
+        <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Senha deve ter no minimo 6 caracteres.</span>
+      </div>
+      <div *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched" class="error-message">
+        <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirmacao de senha e obrigatoria.</span>
+      </div>
+      <div *ngIf="registerForm.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched" class="error-message">
+        <span>As senhas nao coincidem.</span>
+      </div>
+
+      <div class="field-card field-card-full birthdate-card">
+        <span>Data de nascimento</span>
+        <div class="birthdate-grid">
+          <ion-select formControlName="birthDay" interface="action-sheet" placeholder="Dia">
+            <ion-select-option *ngFor="let day of dayOptions" [value]="day">{{ day }}</ion-select-option>
+          </ion-select>
+          <ion-select formControlName="birthMonth" interface="action-sheet" placeholder="Mes">
+            <ion-select-option *ngFor="let month of monthOptions" [value]="month.value">{{ month.label }}</ion-select-option>
+          </ion-select>
+          <ion-select formControlName="birthYear" interface="action-sheet" placeholder="Ano">
+            <ion-select-option *ngFor="let year of yearOptions" [value]="year">{{ year }}</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+      <div *ngIf="(registerForm.get('birthDay')?.touched || registerForm.get('birthMonth')?.touched || registerForm.get('birthYear')?.touched)" class="error-message">
+        <span *ngIf="registerForm.get('birthDay')?.errors?.['required'] || registerForm.get('birthMonth')?.errors?.['required'] || registerForm.get('birthYear')?.errors?.['required']">Data de nascimento e obrigatoria.</span>
+        <span *ngIf="registerForm.errors?.['invalidBirthDate']">A data de nascimento informada e invalida.</span>
+      </div>
+
+      <label class="field-card field-card-full">
+        <span>Genero</span>
+        <ion-select formControlName="gender" placeholder="Selecione">
+          <ion-select-option value="male">Masculino</ion-select-option>
+          <ion-select-option value="female">Feminino</ion-select-option>
+          <ion-select-option value="other">Outro</ion-select-option>
+        </ion-select>
+      </label>
+
+      <div class="feedback-chip error" *ngIf="registerError">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ registerError }}</span>
+      </div>
+
+      <ion-button expand="block" shape="round" type="submit" [disabled]="registerForm.invalid">Cadastrar</ion-button>
+
+      <div class="auth-links">
+        <button type="button" class="ghost-link" (click)="goToLogin()">Ja tem conta? Faca login</button>
+      </div>
+    </form>
+  </div>
+</ion-content>

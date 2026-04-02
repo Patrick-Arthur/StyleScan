@@ -1,0 +1,93 @@
+﻿<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/shop/list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalhes do Produto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="detail-shell">
+  <app-loading-spinner *ngIf="loading" message="Carregando detalhes do produto..."></app-loading-spinner>
+
+  <div *ngIf="error && !loading" class="feedback-state error">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="success && !loading" class="feedback-state">
+    <p>{{ success }}</p>
+  </div>
+
+  <div *ngIf="product && !loading && !error" class="detail-page">
+    <section class="detail-card hero">
+      <div class="hero-gallery">
+        <div class="hero-image">
+          <img [src]="activeImageUrl || product.imageUrl" [alt]="product.name">
+          <div class="hero-badges">
+            <span class="hero-badge">{{ product.category }}</span>
+            <span class="hero-badge light">{{ product.color }}</span>
+          </div>
+        </div>
+        <div class="hero-thumbs" *ngIf="product.imageUrls?.length">
+          <button
+            type="button"
+            class="thumb"
+            *ngFor="let image of product.imageUrls"
+            [class.active]="image === activeImageUrl"
+            (click)="selectImage(image)">
+            <img [src]="image" [alt]="product.name">
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-body">
+        <span class="eyebrow">{{ product.storeName }}</span>
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.description }}</p>
+        <div class="hero-meta">
+          <strong class="price-pill">{{ product.price | currencyFormat }}</strong>
+          <span>{{ product.rating }} / 5 • {{ product.reviews }} avaliacoes</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-card info-card">
+      <div class="info-row">
+        <span>Loja</span>
+        <strong>{{ product.storeName }}</strong>
+      </div>
+      <div class="info-row">
+        <span>Cor</span>
+        <strong>{{ product.color }}</strong>
+      </div>
+      <div class="info-row">
+        <span>Tamanhos</span>
+        <strong>{{ product.sizes.join(', ') }}</strong>
+      </div>
+      <div class="info-row">
+        <span>Status</span>
+        <strong>{{ product.inStock ? 'Em estoque' : 'Indisponivel' }}</strong>
+      </div>
+      <div class="info-row">
+        <span>SKU</span>
+        <strong>{{ product.sku }}</strong>
+      </div>
+    </section>
+
+    <section class="detail-card actions-card">
+      <ion-button expand="block" (click)="addToCart()">
+        <ion-icon slot="start" name="cart-outline"></ion-icon>
+        Adicionar ao carrinho
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="buyNow()">
+        Comprar agora
+      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="openStore()">
+        Abrir na loja
+      </ion-button>
+      <ion-button expand="block" fill="clear" (click)="browseSimilar()">
+        Ver itens parecidos
+      </ion-button>
+    </section>
+  </div>
+</ion-content>

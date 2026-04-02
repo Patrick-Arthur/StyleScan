@@ -1,0 +1,40 @@
+﻿<ion-content [fullscreen]="true" class="history-shell">
+  <div class="history-page">
+    <section class="page-hero card-shell">
+      <div>
+        <span class="eyebrow">Order History</span>
+        <h1>Seu rastro de compras do MVP.</h1>
+        <p>Veja pedidos finalizados, valores e status em uma leitura mais clara e consistente com o resto do app.</p>
+      </div>
+    </section>
+
+    <section class="history-list" *ngIf="orderHistory.length > 0; else emptyState">
+      <article class="history-card card-shell" *ngFor="let order of orderHistory" [class.recent]="isRecentOrder(order.id)">
+        <div class="history-hero" *ngIf="order.previewImageUrl">
+          <img [src]="order.previewImageUrl" [alt]="order.id">
+        </div>
+        <div class="history-topline">
+          <span>Pedido #{{ order.id }}</span>
+          <ion-badge [color]="order.status === 'Entregue' ? 'success' : 'warning'">{{ order.status }}</ion-badge>
+        </div>
+        <h2>{{ order.total | currencyFormat }}</h2>
+        <p>{{ order.items }} itens / {{ order.date | date:'dd/MM/yyyy HH:mm':'':'pt-BR' }}</p>
+        <div class="recent-chip" *ngIf="isRecentOrder(order.id)">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Pedido finalizado agora</span>
+        </div>
+      </article>
+    </section>
+
+    <ng-template #emptyState>
+      <div class="empty-state card-shell">
+        <div class="empty-icon">
+          <ion-icon name="receipt-outline"></ion-icon>
+        </div>
+        <h2>Nenhum pedido ainda</h2>
+        <p>Quando voce finalizar compras no checkout, os registros aparecem aqui.</p>
+        <ion-button shape="round" routerLink="/shop/list">Explorar loja</ion-button>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

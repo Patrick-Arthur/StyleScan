@@ -1,0 +1,265 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+html,
+body,
+ion-app,
+ion-content {
+  font-family: "Segoe UI Variable Display", "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(222, 174, 111, 0.28), transparent 28%),
+    linear-gradient(180deg, #f5efe7 0%, #f2ebe2 42%, #efe4d8 100%);
+  color: #172033;
+}
+
+ion-content {
+  --background:
+    radial-gradient(circle at top, rgba(222, 174, 111, 0.18), transparent 26%),
+    linear-gradient(180deg, #f7f1ea 0%, #efe6db 100%);
+}
+
+ion-button {
+  --border-radius: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+ion-card {
+  border-radius: 24px;
+}
+
+app-looks-list {
+  .avatar-summary {
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    justify-content: center;
+    align-items: center;
+  }
+
+  .avatar-summary strong,
+  .avatar-summary p:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .fit-chip {
+    margin: 0;
+    --background: rgba(255, 255, 255, 0.72);
+    --color: #23414c;
+    border: 1px solid rgba(18, 42, 52, 0.08);
+  }
+
+  .avatar-layer {
+    overflow: hidden;
+    border-radius: 24px;
+    box-shadow: 0 12px 24px rgba(18, 42, 52, 0.12);
+    backdrop-filter: blur(8px);
+    isolation: isolate;
+  }
+
+  .avatar-layer img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: multiply;
+    filter: saturate(0.92) contrast(1.05);
+  }
+
+  .avatar-photo-base {
+    position: absolute;
+    inset: 14px;
+    width: calc(100% - 28px);
+    height: calc(100% - 28px);
+    object-fit: contain;
+    object-position: center top;
+    border-radius: 20px;
+    opacity: 0.9;
+    filter: saturate(0.82) contrast(1.04);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .avatar-photo-base.try-on-active {
+    opacity: 1;
+    filter: none;
+    border-radius: 28px;
+  }
+
+  .layer-top,
+  .layer-dress,
+  .layer-bottom,
+  .layer-shoes,
+  .layer-accessory {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(244, 248, 248, 0.28));
+  }
+
+  .layer-top {
+    border-radius: 28px 28px 20px 20px;
+  }
+
+  .layer-dress {
+    border-radius: 28px 28px 34px 34px;
+  }
+
+  .layer-bottom {
+    border-radius: 18px 18px 26px 26px;
+  }
+
+  .layer-shoes {
+    border-radius: 999px;
+  }
+
+  .layer-accessory {
+    border-radius: 999px;
+  }
+
+  .layer-fabric {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(18, 42, 52, 0.08));
+    z-index: 0;
+  }
+
+  .layer-tag {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(18, 42, 52, 0.72);
+    color: #f5fbfc;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .layer-top img {
+    clip-path: polygon(10% 0, 90% 0, 100% 20%, 86% 100%, 14% 100%, 0 20%);
+  }
+
+  .layer-dress img {
+    clip-path: polygon(20% 0, 80% 0, 100% 26%, 88% 100%, 12% 100%, 0 26%);
+  }
+
+  .layer-bottom img {
+    clip-path: polygon(18% 0, 82% 0, 96% 16%, 76% 100%, 56% 100%, 50% 38%, 44% 100%, 24% 100%, 4% 16%);
+  }
+
+  .layer-shoes img {
+    clip-path: polygon(8% 18%, 92% 18%, 100% 52%, 82% 100%, 18% 100%, 0 52%);
+  }
+
+  .layer-accessory img {
+    clip-path: circle(46% at 50% 50%);
+  }
+
+  .layer-top .layer-fabric {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(119, 150, 164, 0.18));
+  }
+
+  .layer-dress .layer-fabric {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(86, 120, 131, 0.2));
+  }
+
+  .layer-bottom .layer-fabric {
+    background: linear-gradient(180deg, rgba(18, 42, 52, 0.1), rgba(255, 255, 255, 0.16));
+  }
+
+  .layer-shoes .layer-fabric,
+  .layer-accessory .layer-fabric {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(18, 42, 52, 0.14));
+  }
+
+  .catalog-panel .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .catalog-panel .product-card {
+    display: grid;
+    grid-template-rows: 170px auto auto auto;
+    overflow: hidden;
+  }
+
+  .catalog-panel .product-card img {
+    display: block;
+  }
+
+  .catalog-panel .product-body {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+  }
+
+  .catalog-panel .product-body p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .catalog-panel .product-meta {
+    padding-top: 2px;
+  }
+
+  .catalog-panel .product-actions {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+
+  .catalog-panel .product-actions ion-button {
+    margin: 0;
+  }
+
+  @media (max-width: 767px) {
+    .layer-tag {
+      font-size: 0.58rem;
+      bottom: 6px;
+    }
+
+    .catalog-panel .products-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

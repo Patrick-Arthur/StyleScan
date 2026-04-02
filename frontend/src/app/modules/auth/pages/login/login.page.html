@@ -1,0 +1,51 @@
+﻿<ion-content [fullscreen]="true" class="auth-shell">
+  <div class="auth-page">
+    <section class="auth-hero card-shell">
+      <div>
+        <span class="eyebrow">StyleScan Access</span>
+        <h1>Entre e continue montando seu estilo.</h1>
+        <p>Seu avatar, seus looks e a vitrine personalizada ficam centralizados na mesma jornada.</p>
+      </div>
+      <div class="hero-badge">
+        <ion-icon name="sparkles-outline"></ion-icon>
+      </div>
+    </section>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth-form card-shell">
+      <div class="form-head">
+        <span class="eyebrow">Login</span>
+        <h2>Bem-vindo de volta</h2>
+      </div>
+
+      <label class="field-card">
+        <span>Email</span>
+        <ion-input type="email" formControlName="email" placeholder="voce@email.com"></ion-input>
+      </label>
+      <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+        <span *ngIf="loginForm.get('email')?.errors?.['required']">Email e obrigatorio.</span>
+        <span *ngIf="loginForm.get('email')?.errors?.['email']">Email invalido.</span>
+      </div>
+
+      <label class="field-card">
+        <span>Senha</span>
+        <ion-input type="password" formControlName="password" placeholder="Sua senha"></ion-input>
+      </label>
+      <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
+        <span *ngIf="loginForm.get('password')?.errors?.['required']">Senha e obrigatoria.</span>
+        <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Senha deve ter no minimo 6 caracteres.</span>
+      </div>
+
+      <div class="feedback-chip error" *ngIf="loginError">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <span>{{ loginError }}</span>
+      </div>
+
+      <ion-button expand="block" shape="round" type="submit" [disabled]="loginForm.invalid">Entrar</ion-button>
+
+      <div class="auth-links">
+        <button type="button" class="ghost-link" (click)="goToRegister()">Nao tem conta? Cadastre-se</button>
+        <button type="button" class="ghost-link" (click)="goToForgotPassword()">Esqueceu a senha?</button>
+      </div>
+    </form>
+  </div>
+</ion-content>

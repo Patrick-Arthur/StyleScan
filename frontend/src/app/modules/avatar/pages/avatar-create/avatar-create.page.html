@@ -1,0 +1,171 @@
+﻿<ion-content [fullscreen]="true" class="avatar-shell">
+  <form [formGroup]="avatarForm" (ngSubmit)="createAvatar()" class="avatar-page avatar-form">
+    <section class="hero-panel card-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">Avatar Creation</span>
+        <h1>Monte a base visual do seu provador.</h1>
+        <p>
+          Nesta etapa, reunimos medidas e fotos de referencia para gerar um avatar mais fiel e preparar o studio de looks.
+        </p>
+
+        <div class="hero-pills">
+          <div class="hero-pill accent">
+            <span>Base visual</span>
+            <strong>{{ selectedPhotos.length || 0 }} fotos selecionadas</strong>
+          </div>
+          <div class="hero-pill">
+            <span>Fluxo atual</span>
+            <strong>Cadastro manual com suporte a IA</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-preview">
+        <div class="preview-stage" [class.has-photos]="selectedPhotoPreviews.length > 0">
+          <ng-container *ngIf="selectedPhotoPreviews.length > 0; else previewFallback">
+            <div class="preview-grid">
+              <img *ngFor="let preview of selectedPhotoPreviews | slice:0:4" [src]="preview" alt="Previa da foto do avatar">
+            </div>
+          </ng-container>
+          <ng-template #previewFallback>
+            <div class="preview-fallback">
+              <ion-icon name="images-outline"></ion-icon>
+              <strong>Suas referencias aparecem aqui</strong>
+              <span>Use fotos de corpo com boa luz e angulos diferentes.</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <article class="card-shell form-card">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Identidade base</span>
+            <h2>Informacoes principais</h2>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <label class="field-card field-card-full">
+            <span>Nome do avatar</span>
+            <ion-input formControlName="name" placeholder="Ex.: Avatar Casual"></ion-input>
+          </label>
+
+          <label class="field-card">
+            <span>Genero base</span>
+            <ion-select formControlName="gender">
+              <ion-select-option value="female">Feminino</ion-select-option>
+              <ion-select-option value="male">Masculino</ion-select-option>
+              <ion-select-option value="other">Outro</ion-select-option>
+            </ion-select>
+          </label>
+
+          <label class="field-card">
+            <span>Tipo de corpo</span>
+            <ion-select formControlName="bodyType">
+              <ion-select-option value="slim">Estrutura leve</ion-select-option>
+              <ion-select-option value="athletic">Estrutura atletica</ion-select-option>
+              <ion-select-option value="average">Estrutura equilibrada</ion-select-option>
+              <ion-select-option value="curvy">Estrutura suave</ion-select-option>
+            </ion-select>
+          </label>
+
+          <div class="field-card field-card-full tone-card">
+            <span>Tom de pele</span>
+            <ion-segment formControlName="skinTone">
+              <ion-segment-button value="light">Claro</ion-segment-button>
+              <ion-segment-button value="medium">Medio</ion-segment-button>
+              <ion-segment-button value="dark">Profundo</ion-segment-button>
+            </ion-segment>
+          </div>
+        </div>
+      </article>
+
+      <article class="card-shell measure-card">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Medidas</span>
+            <h2>Referencia corporal</h2>
+          </div>
+        </div>
+
+        <div class="field-grid measure-grid">
+          <label class="field-card">
+            <span>Altura (cm)</span>
+            <ion-input type="number" formControlName="height"></ion-input>
+          </label>
+          <label class="field-card">
+            <span>Torax/Busto (cm)</span>
+            <ion-input type="number" formControlName="chest"></ion-input>
+          </label>
+          <label class="field-card">
+            <span>Cintura (cm)</span>
+            <ion-input type="number" formControlName="waist"></ion-input>
+          </label>
+          <label class="field-card">
+            <span>Quadril (cm)</span>
+            <ion-input type="number" formControlName="hips"></ion-input>
+          </label>
+        </div>
+      </article>
+    </section>
+
+    <section class="card-shell gallery-card">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Fotos de referencia</span>
+          <h2>Base visual para a IA</h2>
+        </div>
+      </div>
+
+      <p class="section-copy">
+        Envie varias fotos de corpo para ajudar a IA a entender melhor silhueta, proporcao e tom geral da pele.
+      </p>
+
+      <div class="photo-preview-grid" *ngIf="selectedPhotoPreviews.length > 0">
+        <div class="photo-preview" *ngFor="let preview of selectedPhotoPreviews">
+          <img [src]="preview" alt="Previa da foto do avatar">
+        </div>
+      </div>
+
+      <label class="photo-picker">
+        <input type="file" accept="image/*" multiple (change)="onPhotoSelected($event)">
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        <span>{{ selectedPhotos.length ? (selectedPhotos.length + ' fotos selecionadas') : 'Selecionar fotos de corpo' }}</span>
+      </label>
+    </section>
+
+    <div class="feedback-chip error" *ngIf="error">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <section class="plan-nudge card-shell" *ngIf="planHint">
+      <div>
+        <span class="eyebrow">Conta premium</span>
+        <h2>Pense no proximo passo da sua biblioteca</h2>
+        <p>{{ planHint }}</p>
+      </div>
+      <ion-button fill="outline" shape="round" type="button" (click)="goToUpgrade()">
+        <ion-icon slot="start" name="diamond-outline"></ion-icon>
+        Ver planos
+      </ion-button>
+    </section>
+
+    <div class="page-actions" *ngIf="error">
+      <ion-button fill="outline" expand="block" shape="round" type="button" (click)="goToUpgrade()">
+        <ion-icon slot="start" name="diamond-outline"></ion-icon>
+        Ver planos premium
+      </ion-button>
+    </div>
+
+    <div class="page-actions">
+      <ion-button expand="block" shape="round" type="submit" [disabled]="avatarForm.invalid || submitting">
+        <ion-icon slot="start" name="sparkles-outline"></ion-icon>
+        {{ submitting ? 'Criando avatar...' : 'Criar e continuar' }}
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

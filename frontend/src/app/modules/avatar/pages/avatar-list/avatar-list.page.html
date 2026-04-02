@@ -1,0 +1,99 @@
+﻿<ion-content [fullscreen]="true" class="avatar-shell">
+  <div class="avatar-page">
+    <section class="list-hero card-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">Avatar Library</span>
+        <h1>Seus avatares em uma galeria viva.</h1>
+        <p>
+          Organize as bases visuais do provador, entre nos detalhes e mantenha cada perfil pronto para looks e testes.
+        </p>
+
+        <div class="hero-plan">
+          <span>{{ currentPlanName }}</span>
+          <strong>{{ avatarSlotLabel }}</strong>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <ion-button shape="round" (click)="goToCreateAvatar()" [disabled]="!canCreateAvatar">
+          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+          Novo avatar
+        </ion-button>
+        <ion-button fill="outline" shape="round" (click)="goHome()">Home</ion-button>
+      </div>
+    </section>
+
+    <div class="feedback-card" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando seus avatares...</p>
+    </div>
+
+    <div class="feedback-card error" *ngIf="error">
+      <p>{{ error }}</p>
+      <div class="feedback-actions">
+        <ion-button fill="outline" size="small" (click)="loadAvatars()">Tentar novamente</ion-button>
+        <ion-button fill="clear" size="small" (click)="goToUpgrade()">Ver planos</ion-button>
+      </div>
+    </div>
+
+    <section class="upgrade-spotlight card-shell" *ngIf="showAvatarUpgradeCard && !loading">
+      <div class="upgrade-copy">
+        <span class="eyebrow">Limite de conta</span>
+        <h2>{{ avatarUpgradeTitle }}</h2>
+        <p>{{ avatarUpgradeCopy }}</p>
+      </div>
+
+      <div class="upgrade-actions">
+        <ion-button shape="round" (click)="goToUpgrade()">
+          <ion-icon slot="start" name="diamond-outline"></ion-icon>
+          Explorar planos
+        </ion-button>
+        <ion-button fill="outline" shape="round" (click)="goToCreateAvatar()" [disabled]="!canCreateAvatar">
+          Criar avatar
+        </ion-button>
+      </div>
+    </section>
+
+    <section class="avatar-grid" *ngIf="avatars.length > 0 && !loading">
+      <article class="avatar-card card-shell" *ngFor="let avatar of avatars" (click)="customizeAvatar(avatar.id)">
+        <div class="avatar-media" [class.has-image]="!!getAvatarImageUrl(avatar)">
+          <img *ngIf="getAvatarImageUrl(avatar); else avatarIcon" [src]="getAvatarImageUrl(avatar)" [alt]="avatar.name">
+          <ng-template #avatarIcon>
+            <div class="avatar-icon-fallback">
+              <ion-icon name="body-outline"></ion-icon>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="avatar-meta">
+          <div class="avatar-topline">
+            <span>{{ avatar.bodyType }}</span>
+            <strong>{{ avatar.height }} cm</strong>
+          </div>
+          <h2>{{ avatar.name }}</h2>
+          <p>{{ avatar.skinTone }} • Atualizado em {{ avatar.updatedAt | date:'dd/MM/yyyy' }}</p>
+        </div>
+
+        <div class="avatar-tags">
+          <span>Torax {{ avatar.chest }} cm</span>
+          <span>Cintura {{ avatar.waist }} cm</span>
+          <span>Quadril {{ avatar.hips }} cm</span>
+        </div>
+
+        <div class="avatar-footer">
+          <button type="button" class="ghost-link">Personalizar</button>
+          <ion-icon name="chevron-forward"></ion-icon>
+        </div>
+      </article>
+    </section>
+
+    <div *ngIf="avatars.length === 0 && !loading && !error" class="empty-state card-shell">
+      <div class="empty-icon">
+        <ion-icon name="sparkles-outline"></ion-icon>
+      </div>
+      <h2>Nenhum avatar por enquanto</h2>
+      <p>Crie o primeiro perfil manual para comecar a personalizacao e alimentar o studio de looks.</p>
+      <ion-button shape="round" (click)="goToCreateAvatar()">Criar meu primeiro avatar</ion-button>
+    </div>
+  </div>
+</ion-content>

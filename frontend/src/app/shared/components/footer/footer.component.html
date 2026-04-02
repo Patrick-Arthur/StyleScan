@@ -1,0 +1,11 @@
+<nav class="app-bottom-nav" aria-label="Navegacao principal">
+  <button
+    *ngFor="let item of navItems"
+    type="button"
+    class="nav-item"
+    [class.active]="isActive(item.match)"
+    (click)="navigate(item.route)">
+    <ion-icon [name]="item.icon"></ion-icon>
+    <span>{{ item.label }}</span>
+  </button>
+</nav>

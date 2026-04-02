@@ -1,0 +1,104 @@
+﻿<ion-content [fullscreen]="true" class="checkout-shell">
+  <div class="checkout-page">
+    <section class="checkout-hero card-shell">
+      <div>
+        <span class="eyebrow">Checkout</span>
+        <h1>Revise seu pedido antes de seguir.</h1>
+        <p>O carrinho fica mais claro com resumo, endereco e um fechamento simples para o MVP.</p>
+      </div>
+      <div class="hero-total" *ngIf="cartItems.length > 0">
+        <span>Total atual</span>
+        <strong>{{ totalAmount | currencyFormat }}</strong>
+      </div>
+    </section>
+
+    <ng-container *ngIf="cartItems.length > 0; else emptyCart">
+      <section class="checkout-grid">
+        <article class="card-shell order-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Seu pedido</span>
+              <h2>{{ cartItems.length }} itens no carrinho</h2>
+            </div>
+          </div>
+
+          <div class="order-list">
+            <article class="order-item" *ngFor="let item of cartItems">
+              <img [src]="item.imageUrl" [alt]="item.name">
+              <div class="item-copy">
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.price | currencyFormat }} / Tam. {{ item.size }}</p>
+              </div>
+              <div class="item-actions">
+                <div class="qty-stepper">
+                  <button type="button" (click)="updateQuantity(item.id, item.quantity - 1)">-</button>
+                  <strong>{{ item.quantity }}</strong>
+                  <button type="button" (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
+                </div>
+                <strong class="item-total">{{ (item.price * item.quantity) | currencyFormat }}</strong>
+                <button type="button" class="remove-link" (click)="removeItem(item.id)">Remover</button>
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <article class="card-shell summary-card">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Entrega</span>
+              <h2>Endereco de envio</h2>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <label class="field-card field-card-full">
+              <span>Rua</span>
+              <ion-input [(ngModel)]="shippingAddress.street" placeholder="Rua e numero"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Cidade</span>
+              <ion-input [(ngModel)]="shippingAddress.city"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Estado</span>
+              <ion-input [(ngModel)]="shippingAddress.state"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>CEP</span>
+              <ion-input [(ngModel)]="shippingAddress.zipCode"></ion-input>
+            </label>
+            <label class="field-card">
+              <span>Pais</span>
+              <ion-input [(ngModel)]="shippingAddress.country"></ion-input>
+            </label>
+          </div>
+
+          <div class="summary-total">
+            <span>Total do pedido</span>
+            <strong>{{ totalAmount | currencyFormat }}</strong>
+          </div>
+
+          <div class="feedback-chip error" *ngIf="error">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>{{ error }}</span>
+          </div>
+
+          <ion-button expand="block" shape="round" [disabled]="processing" (click)="processCheckout()">
+            {{ processing ? 'Finalizando...' : 'Finalizar pedido' }}
+          </ion-button>
+        </article>
+      </section>
+    </ng-container>
+
+    <ng-template #emptyCart>
+      <div class="empty-state card-shell">
+        <div class="empty-icon">
+          <ion-icon name="bag-outline"></ion-icon>
+        </div>
+        <h2>Seu carrinho esta vazio</h2>
+        <p>Adicione pecas da loja ou do studio para continuar a jornada de compra.</p>
+        <ion-button shape="round" routerLink="/shop/list">Explorar loja</ion-button>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

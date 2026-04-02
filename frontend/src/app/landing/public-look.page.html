@@ -1,0 +1,42 @@
+<ion-content [fullscreen]="true" class="look-shell">
+  <div class="state-card" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando look publico...</p>
+  </div>
+
+  <div class="state-card error" *ngIf="error && !loading">
+    <p>{{ error }}</p>
+  </div>
+
+  <div class="look-page" *ngIf="detail && !loading">
+    <section class="hero-card card-shell">
+      <img [src]="detail.look.heroImageUrl || detail.items[0]?.imageUrl || '/assets/icon/favicon.png'" [alt]="detail.look.name">
+      <div class="hero-copy">
+        <span class="eyebrow">Look publicado</span>
+        <h1>{{ detail.look.name }}</h1>
+        <p>{{ detail.look.style }} / {{ detail.look.occasion }}</p>
+        <p class="hero-note">{{ detail.look.note || 'Look publicado para inspirar, compartilhar e comprar.' }}</p>
+        <div class="tag-row" *ngIf="detail.look.occasionTags.length > 0">
+          <span *ngFor="let tag of detail.look.occasionTags">{{ tag }}</span>
+        </div>
+        <div class="hero-meta">
+          <strong>{{ detail.look.totalPrice | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+          <button type="button" class="profile-link" (click)="openProfile()">Ver vitrine de {{ detail.ownerDisplayName }}</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="items-grid">
+      <article class="item-card card-shell" *ngFor="let item of detail.items">
+        <img [src]="item.imageUrl" [alt]="item.name">
+        <div class="item-copy">
+          <span>{{ item.category }} / {{ item.color }}</span>
+          <h2>{{ item.name }}</h2>
+          <p>{{ item.storeName }}</p>
+          <strong>{{ item.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+        </div>
+        <ion-button expand="block" shape="round" (click)="openStore(item.productUrl)">Comprar peca</ion-button>
+      </article>
+    </section>
+  </div>
+</ion-content>

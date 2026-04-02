@@ -1,0 +1,258 @@
+.landing-shell {
+  --background:
+    radial-gradient(circle at top left, rgba(156, 229, 244, 0.24), transparent 28%),
+    linear-gradient(180deg, #f7fbfd 0%, #eef6f8 50%, #f9fbfc 100%);
+}
+
+.landing-page {
+  padding: 24px 18px 48px;
+  display: grid;
+  gap: 18px;
+}
+
+.card-shell {
+  border-radius: 30px;
+  border: 1px solid rgba(18, 42, 52, 0.08);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 44px rgba(18, 42, 52, 0.08);
+}
+
+.status-banner {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(16, 37, 45, 0.96), rgba(33, 75, 87, 0.92));
+  color: #f5fbfc;
+}
+
+.status-banner h2,
+.status-banner p {
+  margin: 12px 0 0;
+  color: #f5fbfc;
+}
+
+.hero,
+.overview-card,
+.audience-card,
+.journey,
+.trust-card,
+.contact-card,
+.footer-note,
+.legal-links {
+  padding: 24px;
+}
+
+.hero {
+  display: grid;
+  gap: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(156, 229, 244, 0.32), transparent 30%),
+    linear-gradient(145deg, rgba(10, 23, 31, 0.98), rgba(21, 48, 60, 0.92));
+  color: #f5fbfc;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(156, 229, 244, 0.24);
+  color: #24505d;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero .eyebrow {
+  color: rgba(245, 251, 252, 0.82);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hero h1,
+.section-head h2,
+.footer-note h2 {
+  margin: 12px 0 0;
+  line-height: 1.05;
+}
+
+.hero h1 {
+  font-size: 2.3rem;
+  letter-spacing: -0.05em;
+}
+
+.hero p,
+.audience-card p,
+.step-card p,
+.footer-note p {
+  margin: 14px 0 0;
+  line-height: 1.7;
+}
+
+.hero p {
+  color: rgba(245, 251, 252, 0.82);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.hero-actions ion-button:first-child {
+  --background: linear-gradient(135deg, #f5fbfc, #9ce5f4);
+  --color: #10252d;
+}
+
+.hero-actions ion-button:last-child {
+  --border-color: rgba(245, 251, 252, 0.28);
+  --color: #f5fbfc;
+}
+
+.hero-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.hero-card,
+.bullet-card,
+.step-card,
+.trust-item,
+.contact-row {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hero-card {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero-card span {
+  color: rgba(245, 251, 252, 0.64);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hero-card strong {
+  color: #ffffff;
+  line-height: 1.45;
+}
+
+.section-grid,
+.bullet-grid,
+.step-grid,
+.trust-list,
+.contact-list {
+  display: grid;
+  gap: 14px;
+}
+
+.section-head h2,
+.audience-card p,
+.footer-note h2,
+.footer-note p {
+  color: #172833;
+}
+
+.bullet-card,
+.trust-item,
+.contact-row,
+.step-card {
+  padding: 16px;
+  background: rgba(247, 250, 252, 0.95);
+  border: 1px solid rgba(18, 42, 52, 0.06);
+}
+
+.bullet-card,
+.trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bullet-card ion-icon,
+.trust-item ion-icon {
+  color: #3a97aa;
+  margin-top: 2px;
+}
+
+.bullet-card span,
+.trust-item span,
+.contact-row span {
+  color: #50636d;
+  line-height: 1.55;
+}
+
+.step-card {
+  display: grid;
+  gap: 10px;
+}
+
+.step-index {
+  color: #2a879a;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.step-card strong,
+.contact-row strong {
+  color: #172833;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.footer-note {
+  display: grid;
+  gap: 18px;
+}
+
+.legal-links {
+  display: grid;
+  gap: 18px;
+}
+
+.footer-note .hero-actions {
+  margin-top: 0;
+}
+
+.footer-note .hero-actions ion-button:last-child {
+  --border-color: transparent;
+  --background: linear-gradient(135deg, #10252d, #214b57);
+  --color: #f5fbfc;
+}
+
+@media (min-width: 768px) {
+  .landing-page {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    align-items: stretch;
+  }
+
+  .section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bullet-grid,
+  .step-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-note {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+}

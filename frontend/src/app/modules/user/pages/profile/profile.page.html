@@ -1,0 +1,264 @@
+﻿<ion-content [fullscreen]="true" class="profile-shell">
+  <div class="profile-page" *ngIf="!loading && user; else profileState">
+    <section class="profile-hero card-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">Conta conectada</span>
+        <h1>{{ displayName }}</h1>
+        <p>{{ user.email }}</p>
+
+      <div class="hero-pills">
+          <div class="hero-pill accent">
+            <span>Plano</span>
+            <strong>{{ currentPlanName }}</strong>
+          </div>
+          <div class="hero-pill accent">
+            <span>Status</span>
+            <strong>{{ subscriptionStatusLabel }}</strong>
+          </div>
+          <div class="hero-pill">
+            <span>Nascimento</span>
+            <strong>{{ user.dateOfBirth || 'Nao informado' }}</strong>
+          </div>
+          <div class="hero-pill dark">
+            <span>Genero</span>
+            <strong>{{ user.gender || 'Nao informado' }}</strong>
+          </div>
+        </div>
+
+        <div class="public-link-card" *ngIf="publicProfileUrl">
+          <span>Vitrine publica</span>
+          <strong>{{ publicProfileUrl }}</strong>
+        </div>
+      </div>
+
+      <div class="hero-badge">
+        <div class="badge-orb">
+          <ion-icon name="sparkles-outline"></ion-icon>
+        </div>
+        <button type="button" class="ghost-link" (click)="goHome()">Voltar para home</button>
+      </div>
+    </section>
+
+    <section class="activation-banner card-shell" *ngIf="activationHighlight">
+      <div class="activation-copy">
+        <span class="eyebrow">Premium ativo</span>
+        <h2>Conta liberada para uma jornada mais completa.</h2>
+        <p>{{ activationHighlight }}</p>
+      </div>
+      <ion-button shape="round" (click)="goToUpgrade()">
+        <ion-icon slot="start" name="diamond-outline"></ion-icon>
+        Ver plano
+      </ion-button>
+    </section>
+
+    <section class="profile-grid">
+      <article class="card-shell form-shell">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Edicao rapida</span>
+            <h2>Informacoes pessoais</h2>
+          </div>
+        </div>
+
+        <p class="form-intro">
+          Atualize apenas o essencial para manter avatar, looks e recomendacoes coerentes com seu perfil.
+        </p>
+
+        <div class="form-grid">
+          <label class="field-card">
+            <span>Nome</span>
+            <ion-input [(ngModel)]="user.firstName" placeholder="Seu nome"></ion-input>
+          </label>
+
+          <label class="field-card">
+            <span>Sobrenome</span>
+            <ion-input [(ngModel)]="user.lastName" placeholder="Seu sobrenome"></ion-input>
+          </label>
+
+          <label class="field-card field-card-full is-disabled">
+            <span>Email</span>
+            <ion-input type="email" [value]="user.email" disabled></ion-input>
+          </label>
+
+          <label class="field-card">
+            <span>Data de nascimento</span>
+            <ion-input type="date" [(ngModel)]="user.dateOfBirth"></ion-input>
+          </label>
+
+          <label class="field-card">
+            <span>Genero</span>
+            <ion-select [(ngModel)]="user.gender" placeholder="Selecione">
+              <ion-select-option value="male">Masculino</ion-select-option>
+              <ion-select-option value="female">Feminino</ion-select-option>
+              <ion-select-option value="other">Outro</ion-select-option>
+            </ion-select>
+          </label>
+        </div>
+
+        <div class="feedback-stack" *ngIf="feedback || error">
+          <div class="feedback-chip success" *ngIf="feedback">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>{{ feedback }}</span>
+          </div>
+
+          <div class="feedback-chip error" *ngIf="error">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span>{{ error }}</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <ion-button fill="outline" shape="round" (click)="goHome()">Home</ion-button>
+          <ion-button shape="round" (click)="saveProfile()" [disabled]="saving">
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            {{ saving ? 'Salvando...' : 'Salvar alteracoes' }}
+          </ion-button>
+        </div>
+      </article>
+
+      <article class="card-shell profile-note">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Upgrade</span>
+            <h2>Destrave mais acoes no StyleScan</h2>
+          </div>
+        </div>
+
+        <p>
+          Compare os planos pagos, visualize limites de uso e veja como a versao premium pode liberar mais
+          avatares, mais provas e mais imagens realistas.
+        </p>
+
+        <div class="summary-note">
+          <ion-icon name="sparkles-outline"></ion-icon>
+          <span>{{ currentPlanSummary }}</span>
+        </div>
+
+        <ion-button expand="block" shape="round" (click)="goToUpgrade()">
+          <ion-icon slot="start" name="diamond-outline"></ion-icon>
+          Ver planos premium
+        </ion-button>
+      </article>
+    </section>
+
+    <section class="subscription-section card-shell">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Mercado Pago</span>
+          <h2>Conferencia da ultima cobranca</h2>
+        </div>
+
+        <ion-button fill="clear" size="small" (click)="refreshSubscriptionStatus()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          Atualizar
+        </ion-button>
+      </div>
+
+      <div class="subscription-grid">
+        <article class="subscription-card">
+          <span>Status recebido</span>
+          <strong>{{ user.subscription.lastPaymentStatus || user.subscription.status || 'Sem pagamento recente' }}</strong>
+          <small>{{ user.subscription.lastPaymentStatusDetail || 'Sem detalhe adicional do processador.' }}</small>
+        </article>
+
+        <article class="subscription-card">
+          <span>Payment ID</span>
+          <strong>{{ user.subscription.lastPaymentId || 'Ainda nao registrado' }}</strong>
+          <small>Use este identificador para conferir a transacao no Mercado Pago.</small>
+        </article>
+
+        <article class="subscription-card">
+          <span>Ultimo update do pagamento</span>
+          <strong>{{ formatDateTime(user.subscription.lastPaymentUpdatedAt) }}</strong>
+          <small>Horario informado pelo fluxo de pagamento.</small>
+        </article>
+
+        <article class="subscription-card">
+          <span>Ultimo webhook recebido</span>
+          <strong>{{ formatDateTime(user.subscription.lastWebhookReceivedAt) }}</strong>
+          <small>Horario em que o backend recebeu a notificacao do Mercado Pago.</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="usage-section card-shell" *ngIf="usageCards.length > 0">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Consumo da conta</span>
+          <h2>Leitura rapida do seu plano atual</h2>
+        </div>
+      </div>
+
+      <div class="usage-grid">
+        <article class="usage-card" *ngFor="let card of usageCards">
+          <div class="usage-topline">
+            <strong>{{ card.label }}</strong>
+            <span>{{ card.detail }}</span>
+          </div>
+          <div class="usage-bar">
+            <span [style.width.%]="card.progress"></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="unlocked-section card-shell" *ngIf="isPremiumPlan && unlockedHighlights.length > 0">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Recursos liberados</span>
+          <h2>O que o seu plano destravou agora</h2>
+        </div>
+      </div>
+
+      <div class="unlocked-grid">
+        <article class="unlocked-card" *ngFor="let item of unlockedHighlights">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ item }}</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="published-section card-shell">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Vitrine publicada</span>
+          <h2>Looks prontos para compartilhar no seu perfil</h2>
+        </div>
+      </div>
+
+      <p class="section-copy">
+        Publique os looks que representam melhor seu estilo e use essa area como sua selecao social dentro do app.
+      </p>
+
+      <div class="published-empty" *ngIf="publishedLooks.length === 0">
+        <ion-icon name="images-outline"></ion-icon>
+        <p>Ainda nao ha looks publicados. Abra um look salvo e toque em “Publicar no perfil”.</p>
+      </div>
+
+      <div class="published-grid" *ngIf="publishedLooks.length > 0">
+        <article class="published-card" *ngFor="let look of publishedLooks | slice:0:3">
+          <img [src]="look.heroImageUrl || look.items[0]?.imageUrl" [alt]="look.name">
+          <div class="published-copy">
+            <span>{{ look.style }} / {{ look.occasion }}</span>
+            <h3>{{ look.name }}</h3>
+            <p>{{ look.note || 'Look publicado na sua vitrine social do StyleScan.' }}</p>
+            <small>Publicado em {{ (look.publishedAt || look.createdAt) | date:'dd/MM/yyyy':'':'pt-BR' }}</small>
+          </div>
+          <ion-button fill="outline" shape="round" (click)="openLook(look.id)">Abrir look</ion-button>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <ng-template #profileState>
+    <div class="state-card" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando seus dados...</p>
+    </div>
+
+    <div class="state-card error" *ngIf="!loading && error">
+      <p>{{ error }}</p>
+      <ion-button fill="outline" (click)="loadProfile()">Tentar novamente</ion-button>
+    </div>
+  </ng-template>
+</ion-content>

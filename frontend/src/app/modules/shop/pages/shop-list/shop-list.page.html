@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goHome()">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Loja</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="shop-shell">
+  <div class="shop-page">
+    <section class="shop-hero">
+      <div>
+        <span class="eyebrow">Catalogo do MVP</span>
+        <h1>Explore pecas ligadas aos looks do app.</h1>
+        <p>Filtre por categoria e faixa de preco para encontrar combinacoes mais proximas do seu estilo.</p>
+      </div>
+    </section>
+
+    <section class="filters-card">
+      <div class="filters-grid">
+        <ion-item>
+          <ion-label position="stacked">Categoria</ion-label>
+          <ion-select [(ngModel)]="selectedCategory" interface="popover">
+            <ion-select-option *ngFor="let option of categoryOptions" [value]="option.value">{{ option.label }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Faixa de preco</ion-label>
+          <ion-select [(ngModel)]="selectedPriceRange" interface="popover">
+            <ion-select-option *ngFor="let option of priceOptions" [value]="option.value">{{ option.label }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="filter-actions">
+        <ion-button class="apply-button" (click)="applyFilters()">Aplicar filtros</ion-button>
+        <ion-button fill="clear" (click)="clearFilters()">Limpar</ion-button>
+      </div>
+    </section>
+
+    <app-loading-spinner *ngIf="loading" message="Carregando produtos..."></app-loading-spinner>
+
+    <div *ngIf="error && !loading" class="feedback-state error">
+      <p>{{ error }}</p>
+    </div>
+
+    <section *ngIf="!loading && !error" class="results-block">
+      <div class="section-heading">
+        <span>Resultados</span>
+        <h2>{{ products.length }} produtos encontrados</h2>
+      </div>
+
+      <div class="product-grid" *ngIf="products.length > 0; else emptyState">
+        <article class="product-card" *ngFor="let product of products; trackBy: trackByProduct" (click)="viewProductDetail(product.id)">
+          <div class="product-cover">
+            <img [src]="product.imageUrl" [alt]="product.name">
+            <div class="product-badges">
+              <span class="badge badge-category">{{ product.category }}</span>
+              <span class="badge badge-color">{{ product.color }}</span>
+            </div>
+          </div>
+          <div class="product-body">
+            <span>{{ product.storeName }}</span>
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <div class="product-meta">
+              <strong class="price-pill">{{ product.price | currencyFormat }}</strong>
+              <small>{{ product.rating }} / 5</small>
+            </div>
+            <div class="product-actions">
+              <ion-button size="small" (click)="$event.stopPropagation(); viewProductDetail(product.id)">
+                Detalhes
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="$event.stopPropagation(); addToCart(product)">
+                Carrinho
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="$event.stopPropagation(); openStore(product)">
+                Loja
+              </ion-button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #emptyState>
+        <div class="feedback-state">
+          <p>Nenhum produto encontrado com esse filtro. Tente outra combinacao.</p>
+          <ion-button fill="outline" (click)="clearFilters()">Voltar ao catalogo</ion-button>
+        </div>
+      </ng-template>
+    </section>
+  </div>
+</ion-content>

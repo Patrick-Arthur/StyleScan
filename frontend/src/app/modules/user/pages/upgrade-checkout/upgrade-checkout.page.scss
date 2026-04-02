@@ -1,0 +1,156 @@
+.checkout-shell {
+  --background: linear-gradient(180deg, #f6fbfd 0%, #eff4f8 100%);
+}
+
+.checkout-page {
+  padding: 24px 18px calc(120px + env(safe-area-inset-bottom)) 18px;
+  display: grid;
+  gap: 18px;
+}
+
+.card-shell {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(117, 138, 161, 0.14);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(18, 38, 63, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.checkout-hero,
+.checkout-summary,
+.checkout-panel {
+  padding: 24px;
+}
+
+.checkout-hero {
+  display: grid;
+  gap: 18px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(156, 229, 244, 0.28);
+  color: #24505d;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checkout-hero h1,
+.checkout-summary h2,
+.checkout-panel h2 {
+  margin: 10px 0 0;
+  color: #162033;
+}
+
+.checkout-hero p,
+.checkout-summary p,
+.checkout-panel p {
+  margin: 12px 0 0;
+  color: #607086;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+}
+
+.checkout-grid,
+.highlight-list,
+.checkout-actions {
+  display: grid;
+  gap: 16px;
+}
+
+.price-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.price-line strong {
+  font-size: 2rem;
+  line-height: 1;
+  color: #162033;
+}
+
+.price-line span {
+  color: #607086;
+  font-weight: 600;
+}
+
+.highlight-item,
+.mock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.95);
+}
+
+.highlight-item {
+  justify-content: flex-start;
+}
+
+.highlight-item ion-icon {
+  color: #42a2b6;
+}
+
+.highlight-item span,
+.mock-row span {
+  color: #4d6075;
+}
+
+.mock-row strong {
+  color: #162033;
+}
+
+.mock-payment {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.feedback-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  margin-top: 16px;
+}
+
+.feedback-chip.error {
+  background: rgba(215, 91, 91, 0.12);
+  color: #b04646;
+}
+
+.feedback-chip.success {
+  background: rgba(56, 166, 116, 0.12);
+  color: #2a7a56;
+}
+
+@media (min-width: 768px) {
+  .checkout-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-inline: 28px;
+  }
+
+  .checkout-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .checkout-grid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    align-items: start;
+  }
+}

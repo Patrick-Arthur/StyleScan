@@ -1,0 +1,561 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goHome()">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Studio de Looks</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="looks-shell">
+  <div class="looks-page" *ngIf="!loading; else loadingState">
+    <section class="studio-hero">
+      <div>
+        <span class="eyebrow">Curadoria por estilo</span>
+        <h1>Escolha uma linguagem visual e monte o look direto no avatar.</h1>
+        <p>Agora voce tambem pode gerar um preview de provador com IA usando a foto-base do avatar e as pecas selecionadas.</p>
+      </div>
+      <div class="hero-actions" *ngIf="avatars.length > 0; else noAvatarState">
+        <ion-item class="hero-select">
+          <ion-label position="stacked">Avatar ativo</ion-label>
+          <ion-select [(ngModel)]="selectedAvatarId" interface="action-sheet" (ionChange)="onAvatarChange()">
+            <ion-select-option *ngFor="let avatar of avatars" [value]="avatar.id">{{ avatar.name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <div class="hero-summary">
+          <span>{{ currentPlanName }}</span>
+          <span>{{ selectedCountLabel }}</span>
+          <strong>{{ activeBoard.title }}</strong>
+          <span>{{ avatarTryOnUsageLabel }}</span>
+          <span>{{ realisticUsageLabel }}</span>
+        </div>
+      </div>
+    </section>
+
+    <ion-text color="danger" *ngIf="error">
+      <p class="feedback error">{{ error }}</p>
+    </ion-text>
+    <ion-text color="success" *ngIf="success">
+      <p class="feedback success">{{ success }}</p>
+    </ion-text>
+
+    <section class="board-rail" *ngIf="avatars.length > 0">
+      <button
+        type="button"
+        class="board-card"
+        *ngFor="let board of boards; trackBy: trackByBoard"
+        [class.active]="board.id === selectedBoardId"
+        [style.--board-accent]="board.accent"
+        (click)="applyBoard(board.id)">
+        <div class="board-media">
+          <img class="board-image" [src]="getBoardImageUrl(board.id)" [alt]="board.title">
+          <div class="board-overlay"></div>
+          <div class="board-chip">Style</div>
+          <div class="board-palette">
+            <span *ngFor="let swatch of board.palette" [style.background]="swatch"></span>
+          </div>
+        </div>
+        <div class="board-copy">
+          <strong>{{ board.title }}</strong>
+          <p>{{ board.subtitle }}</p>
+        </div>
+      </button>
+    </section>
+
+    <section class="style-brief" *ngIf="avatars.length > 0">
+      <div>
+        <span class="eyebrow">Estilo selecionado</span>
+        <h2>{{ activeBoard.title }}</h2>
+      </div>
+      <p>{{ activeBoard.description }}</p>
+    </section>
+
+    <section class="studio-grid" *ngIf="avatars.length > 0">
+      <article class="panel avatar-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Avatar em montagem</span>
+            <h3>{{ currentAvatar?.name }}</h3>
+          </div>
+          <ion-button fill="clear" size="small" (click)="clearSelection()">
+            Limpar
+          </ion-button>
+        </div>
+
+        <div class="avatar-stage">
+          <div class="studio-status-card">
+            <div class="studio-status-copy">
+              <span>{{ studioStatusTitle }}</span>
+              <p>{{ studioStatusCopy }}</p>
+            </div>
+            <div class="stage-toggle" *ngIf="hasGeneratedPreview">
+              <ion-button size="small" [fill]="stageViewMode === 'result' ? 'solid' : 'outline'" (click)="stageViewMode = 'result'">
+                Resultado
+              </ion-button>
+              <ion-button size="small" [fill]="stageViewMode === 'base' ? 'solid' : 'outline'" (click)="stageViewMode = 'base'">
+                Base
+              </ion-button>
+            </div>
+          </div>
+
+          <div class="avatar-viewer" [ngStyle]="avatarCanvasStyle">
+            <img *ngIf="stageImageUrl" class="avatar-photo-base" [class.try-on-active]="tryOnPreviewUrl" [src]="stageImageUrl" [alt]="currentAvatar?.name || ''">
+            <div class="avatar-aura" [style.--accent]="activeBoard.accent"></div>
+            <div class="avatar-mannequin" *ngIf="!stageImageUrl" [ngStyle]="mannequinStyle">
+              <div class="mannequin-head" [ngStyle]="bodyStyles.head"></div>
+              <div class="mannequin-neck" [ngStyle]="bodyStyles.neck"></div>
+              <div class="mannequin-torso" [ngStyle]="bodyStyles.torso"></div>
+              <div class="mannequin-arms" [ngStyle]="bodyStyles.arms"></div>
+              <div class="mannequin-legs" [ngStyle]="bodyStyles.legs"></div>
+
+              <div
+                class="avatar-layer"
+                *ngFor="let layer of avatarLayers"
+                [attr.data-category]="layer.category"
+                [ngClass]="'layer-' + layer.category"
+                [ngStyle]="layer.style"
+                [class.visible]="getLayerProduct(layer.category)">
+                <ng-container *ngIf="getLayerProduct(layer.category) as product">
+                  <div class="layer-shell" [ngStyle]="getLayerBackdropStyle(layer.category)">
+                    <div class="layer-fabric"></div>
+                    <img [src]="product.imageUrl" [alt]="product.name">
+                    <span class="layer-tag">{{ getLayerLabel(layer.category) }}</span>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <div class="avatar-summary">
+            <strong>{{ currentAvatar?.bodyType }}</strong>
+            <p>{{ currentAvatar?.height }} cm / {{ currentAvatar?.skinTone }} / {{ activeBoard.title }}</p>
+            <ion-chip color="light" class="fit-chip" *ngFor="let item of fitHighlights">{{ item }}</ion-chip>
+            <p>{{ fitNote }}</p>
+          </div>
+
+          <div class="look-traits" *ngIf="lookTraits.length > 0">
+            <article class="look-trait-card" *ngFor="let trait of lookTraits">
+              <span>{{ trait.label }}</span>
+              <strong>{{ trait.value }}</strong>
+            </article>
+          </div>
+
+          <div class="selected-stack" *ngIf="selectedProducts.length > 0; else emptySelection">
+            <article class="selected-card" *ngFor="let product of selectedProducts">
+              <img [src]="product.imageUrl" [alt]="product.name">
+              <div>
+                <span>{{ product.category }}</span>
+                <strong>{{ product.name }}</strong>
+                <p>{{ product.storeName }} • {{ product.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</p>
+              </div>
+              <div class="selected-actions">
+                <ion-button fill="clear" size="small" (click)="$event.stopPropagation(); openStore(product)">
+                  <ion-icon slot="icon-only" name="open-outline"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="danger" size="small" (click)="$event.stopPropagation(); removeProduct(product)">
+                  <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </article>
+          </div>
+
+          <ng-template #emptySelection>
+            <div class="empty-state inline">
+              <p>Selecione pecas dos quadros abaixo para vestir o avatar.</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="avatar-footer">
+          <div class="footer-total">
+            <span>Total estimado</span>
+            <strong>{{ totalSelectedPrice | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+          </div>
+          <p class="footer-hint">{{ tryOnHint }}</p>
+
+          <div class="look-editorial-card">
+            <div class="editorial-heading">
+              <span class="eyebrow">Identidade do look</span>
+              <strong>Deixe o conjunto com mais cara de closet curado</strong>
+            </div>
+
+            <ion-item class="hero-select">
+              <ion-label position="stacked">Nome do look</ion-label>
+              <ion-input [(ngModel)]="customLookName" placeholder="Ex.: Noite casual em azul"></ion-input>
+            </ion-item>
+
+            <ion-item class="hero-select">
+              <ion-label position="stacked">Nota curta</ion-label>
+              <ion-textarea [(ngModel)]="customLookNote" autoGrow="true" rows="3" maxlength="220" placeholder="Ex.: Base leve para jantar, com tenis limpo e camada superior mais alinhada."></ion-textarea>
+            </ion-item>
+
+            <ion-item class="hero-select">
+              <ion-label position="stacked">Tags de ocasiao</ion-label>
+              <ion-input [(ngModel)]="customLookTagsInput" placeholder="Ex.: jantar, viagem, trabalho criativo"></ion-input>
+            </ion-item>
+
+            <div class="tag-preview-row" *ngIf="parsedOccasionTags.length > 0">
+              <span *ngFor="let tag of parsedOccasionTags">{{ tag }}</span>
+            </div>
+
+            <div class="studio-collections-card" *ngIf="currentSavedLook as savedLook">
+              <div class="editorial-heading">
+                <span class="eyebrow">Colecoes</span>
+                <strong>{{ savedLook.name }}</strong>
+              </div>
+              <p class="studio-collections-copy">Organize esse look salvo em colecoes sem sair do studio.</p>
+              <div class="studio-collections-row" *ngIf="currentSavedLookCollections.length > 0; else noStudioCollections">
+                <button
+                  type="button"
+                  class="studio-collection-pill"
+                  *ngFor="let collection of currentSavedLookCollections"
+                  (click)="removeCurrentLookFromCollection(collection)">
+                  {{ collection.label }} ×
+                </button>
+              </div>
+              <ng-template #noStudioCollections>
+                <p class="studio-collections-empty">Esse look ainda nao esta em nenhuma colecao manual.</p>
+              </ng-template>
+              <ion-button fill="outline" size="small" (click)="addCurrentLookToCollection()">
+                Adicionar a colecao
+              </ion-button>
+            </div>
+          </div>
+
+          <div class="footer-actions">
+            <ion-button fill="outline" [disabled]="!canGenerateTryOn || generatingTryOn" (click)="generateTryOnPreview('avatar')">
+              {{ generatingTryOn ? 'Gerando provador...' : 'Provar no avatar' }}
+            </ion-button>
+            <ion-button fill="outline" [disabled]="!canGenerateTryOn || generatingRealisticTryOn" (click)="generateTryOnPreview('realistic')">
+              {{ generatingRealisticTryOn ? 'Gerando foto realista...' : 'Gerar foto realista' }}
+            </ion-button>
+            <ion-button fill="outline" [disabled]="!tryOnPreviewUrl && !currentSavedLook && selectedProducts.length === 0" (click)="shareCurrentResult()">
+              Compartilhar
+            </ion-button>
+            <ion-button fill="outline" [disabled]="!canShopSelection" (click)="shopSelectedLook()">
+              Comprar pecas
+            </ion-button>
+            <ion-button [disabled]="!canSaveLook" (click)="saveCurrentLook()">
+              {{ savingLook ? 'Salvando...' : (currentSelectionSaved ? 'Look salvo' : 'Salvar look') }}
+            </ion-button>
+            <ion-button fill="clear" (click)="goToUpgrade()">
+              Ver planos
+            </ion-button>
+          </div>
+
+          <div class="plan-nudges" *ngIf="planNudges.length > 0">
+            <article class="plan-nudge-card" *ngFor="let nudge of planNudges">
+              <div class="plan-nudge-copy">
+                <span>{{ nudge.label }}</span>
+                <strong>Seu plano pode liberar mais aqui</strong>
+                <p>{{ nudge.copy }}</p>
+              </div>
+              <ion-button fill="outline" size="small" (click)="goToUpgrade()">
+                Ver upgrade
+              </ion-button>
+            </article>
+          </div>
+
+          <div class="premium-strip" *ngIf="isPremiumPlan">
+            <div>
+              <span>Plano atual</span>
+              <strong>{{ currentPlanName }}</strong>
+            </div>
+            <p>Seu plano ja libera mais tentativas no provador e mais folga para fotos realistas.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel catalog-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Pecas do estilo</span>
+            <h3>Escolha o que entra no look</h3>
+          </div>
+          <div class="catalog-summary">
+            <span>{{ curatedProducts.length }} itens</span>
+            <strong>{{ activeBoard.title }}</strong>
+          </div>
+        </div>
+
+        <div class="products-grid" *ngIf="curatedProducts.length > 0; else emptyProducts">
+          <article class="product-card" *ngFor="let product of curatedProducts; trackBy: trackByProduct" [class.selected]="isSelected(product.id)" (click)="addPiece(product)">
+            <div class="product-cover">
+              <img [src]="product.imageUrl" [alt]="product.name">
+              <div class="product-badges">
+                <span class="badge badge-category">{{ product.category }}</span>
+                <span class="badge badge-color">{{ product.color }}</span>
+              </div>
+              <div class="selected-mark" *ngIf="isSelected(product.id)">
+                <ion-icon name="checkmark-circle"></ion-icon>
+                <span>No avatar</span>
+              </div>
+            </div>
+            <div class="product-body">
+              <span>{{ product.storeName }}</span>
+              <h4>{{ product.name }}</h4>
+              <p>{{ product.description }}</p>
+            </div>
+            <div class="product-meta">
+              <strong class="price-pill">{{ product.price | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</strong>
+              <small>Rating {{ product.rating | number:'1.1-1' }}</small>
+            </div>
+            <div class="product-actions">
+              <ion-button size="small" [fill]="isSelected(product.id) ? 'solid' : 'outline'" (click)="addPiece(product)">
+                {{ isSelected(product.id) ? 'No avatar' : 'Avatar' }}
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="$event.stopPropagation(); addToCart(product)">
+                Carrinho
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="$event.stopPropagation(); openStore(product)">
+                Loja
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="$event.stopPropagation(); openProduct(product.id)">
+                Detalhes
+              </ion-button>
+            </div>
+          </article>
+        </div>
+
+        <ng-template #emptyProducts>
+          <div class="empty-state">
+            <p>Nao encontramos pecas para esse estilo no catalogo atual.</p>
+          </div>
+        </ng-template>
+      </article>
+
+      <article class="panel preview-history-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Historico</span>
+            <h3>Previews recentes do studio</h3>
+          </div>
+          <div class="catalog-summary">
+            <span *ngIf="previewHistoryLoading">Atualizando...</span>
+            <span *ngIf="!previewHistoryLoading">{{ previewHistory.length }} recentes</span>
+            <strong>{{ currentAvatar?.name || 'Avatar' }}</strong>
+          </div>
+        </div>
+
+        <div class="preview-compare-panel" *ngIf="currentOrLatestPreviewUrl">
+          <article class="compare-card">
+            <span>{{ comparisonPrimaryLabel }}</span>
+            <img [src]="currentOrLatestPreviewUrl" [alt]="currentAvatar?.name || 'Preview atual'">
+          </article>
+
+          <article class="compare-card compare-secondary" *ngIf="comparisonPreview; else comparePlaceholder">
+            <span>Comparando com / {{ comparisonPreview.mode === 'realistic' ? 'Realista' : 'Avatar' }}</span>
+            <img [src]="comparisonPreview.imageUrl" [alt]="comparisonPreview.style">
+            <strong>{{ comparisonPreview.style }}</strong>
+            <p>{{ comparisonPreview.occasion }} / {{ comparisonPreview.productCategories.join(' + ') }}</p>
+            <ion-button size="small" fill="outline" (click)="clearPreviewComparison()">
+              Remover comparacao
+            </ion-button>
+          </article>
+
+          <ng-template #comparePlaceholder>
+            <article class="compare-card compare-placeholder">
+              <span>Comparar com</span>
+              <p>Escolha um preview recente abaixo para ver lado a lado com o resultado atual.</p>
+            </article>
+          </ng-template>
+        </div>
+
+        <div class="compare-actions" *ngIf="canPromotePreviewToCover">
+          <ion-button size="small" fill="outline" (click)="promotePreviewToCover()">
+            Definir como capa do look salvo
+          </ion-button>
+          <span>{{ currentSavedLook?.name }}</span>
+        </div>
+
+        <div class="preview-history-grid" *ngIf="previewHistory.length > 0; else emptyPreviewHistory">
+          <article
+            class="preview-history-card"
+            *ngFor="let item of previewHistory; trackBy: trackByPreviewHistory"
+            [class.compare-active]="selectedComparisonPreviewId === item.id">
+            <div class="preview-history-media">
+              <img [src]="item.imageUrl" [alt]="item.style">
+              <span class="preview-mode">{{ item.mode === 'realistic' ? 'Realista' : 'Avatar' }}</span>
+            </div>
+            <div class="preview-history-copy">
+              <strong>{{ item.style }}</strong>
+              <p>{{ item.occasion }} / {{ item.productCategories.join(' + ') }}</p>
+              <small>{{ item.createdAt | date:'dd/MM HH:mm':'':'pt-BR' }}</small>
+            </div>
+            <div class="preview-history-actions">
+              <ion-button size="small" fill="outline" (click)="applyPreviewHistoryItem(item)">
+                Abrir
+              </ion-button>
+              <ion-button size="small" [fill]="selectedComparisonPreviewId === item.id ? 'solid' : 'clear'" (click)="togglePreviewComparison(item)">
+                {{ selectedComparisonPreviewId === item.id ? 'Comparando' : 'Comparar' }}
+              </ion-button>
+            </div>
+          </article>
+        </div>
+
+        <ng-template #emptyPreviewHistory>
+          <div class="empty-state">
+            <p>Assim que voce gerar previews, eles ficam salvos aqui para comparar resultados e voltar em versoes anteriores.</p>
+          </div>
+        </ng-template>
+      </article>
+    </section>
+
+    <section class="saved-looks panel" *ngIf="savedLooks.length > 0">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Galeria</span>
+          <h3>Looks salvos no seu perfil</h3>
+        </div>
+      </div>
+
+      <div class="saved-filters-card">
+        <ion-item class="hero-select">
+          <ion-label position="stacked">Buscar no closet</ion-label>
+          <ion-input [(ngModel)]="savedLooksSearchTerm" placeholder="Nome, nota ou tag"></ion-input>
+        </ion-item>
+
+        <div class="saved-filters-grid">
+          <ion-item class="hero-select">
+            <ion-label position="stacked">Ocasião</ion-label>
+            <ion-select [(ngModel)]="savedLooksOccasionFilter" interface="action-sheet">
+              <ion-select-option value="all">Todas</ion-select-option>
+              <ion-select-option *ngFor="let occasion of availableSavedLookOccasions" [value]="occasion">{{ occasion }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="hero-select">
+            <ion-label position="stacked">Tag</ion-label>
+            <ion-select [(ngModel)]="savedLooksTagFilter" interface="action-sheet">
+              <ion-select-option value="all">Todas</ion-select-option>
+              <ion-select-option *ngFor="let tag of availableSavedLookTags" [value]="tag">{{ tag }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="hero-select">
+            <ion-label position="stacked">Ordenar por</ion-label>
+            <ion-select [(ngModel)]="savedLooksSort" interface="action-sheet">
+              <ion-select-option value="recent">Mais recentes</ion-select-option>
+              <ion-select-option value="oldest">Mais antigos</ion-select-option>
+              <ion-select-option value="price-desc">Maior preco</ion-select-option>
+              <ion-select-option value="price-asc">Menor preco</ion-select-option>
+              <ion-select-option value="with-cover">Com capa</ion-select-option>
+              <ion-select-option value="style">Estilo</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div class="saved-filter-actions">
+          <div class="saved-filter-summary">
+            <span>{{ filteredSavedLooks.length }} looks visiveis</span>
+            <p *ngIf="hasSavedLookFiltersApplied">Filtros ativos para explorar o closet com mais precisao.</p>
+            <p *ngIf="!hasSavedLookFiltersApplied">Use busca, ocasião e tags para encontrar combinacoes mais rapido.</p>
+          </div>
+          <ion-button fill="outline" size="small" [disabled]="!hasSavedLookFiltersApplied" (click)="clearSavedLookFilters()">
+            Limpar filtros
+          </ion-button>
+        </div>
+      </div>
+
+      <article class="saved-card" *ngIf="featuredSavedLook as featuredLook">
+        <div class="saved-copy">
+          <span>Destaque atual / {{ featuredLook.style }}</span>
+          <h4>{{ featuredLook.name }}</h4>
+          <p class="saved-note" *ngIf="featuredLook.note">{{ featuredLook.note }}</p>
+          <p>{{ featuredLook.items.length }} pecas / {{ featuredLook.totalPrice | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</p>
+          <div class="saved-tags" *ngIf="featuredLook.occasionTags.length > 0">
+            <span *ngFor="let tag of featuredLook.occasionTags">{{ tag }}</span>
+          </div>
+        </div>
+        <div class="saved-items">
+          <img *ngIf="featuredLook.heroImageUrl; else featuredFallback" [src]="featuredLook.heroImageUrl" [alt]="featuredLook.name">
+          <ng-template #featuredFallback>
+            <img *ngFor="let item of featuredLook.items | slice:0:3" [src]="item.imageUrl" [alt]="item.name">
+          </ng-template>
+        </div>
+        <div class="saved-actions">
+          <ion-button fill="clear" size="small" (click)="toggleFavoriteLook(featuredLook, $event)">
+            {{ isFavoriteLook(featuredLook.id) ? 'Desfavoritar' : 'Favoritar' }}
+          </ion-button>
+          <ion-button fill="outline" size="small" (click)="reloadSavedLook(featuredLook)">
+            Reabrir no studio
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="shopSavedLook(featuredLook)">
+            Comprar look
+          </ion-button>
+          <ion-button size="small" (click)="openLookDetail(featuredLook.id)">
+            Ver detalhe
+          </ion-button>
+        </div>
+      </article>
+
+      <div class="empty-state" *ngIf="filteredSavedLooks.length === 0">
+        <p>Nenhum look encontrado com os filtros atuais. Tente limpar a busca ou trocar a ocasião.</p>
+      </div>
+
+      <div class="hero-actions" *ngFor="let group of groupedSavedLooks; trackBy: trackByLookGroup">
+        <div>
+          <span class="eyebrow">{{ group.title }}</span>
+          <p>{{ group.subtitle }}</p>
+        </div>
+        <div class="saved-grid">
+          <article class="saved-card" *ngFor="let look of group.looks; trackBy: trackByLook">
+            <div class="saved-copy">
+              <span>{{ look.occasion }} / {{ look.style }}</span>
+              <h4>{{ look.name }}</h4>
+              <p class="saved-note" *ngIf="look.note">{{ look.note }}</p>
+              <p>{{ look.items.length }} pecas / {{ look.totalPrice | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</p>
+              <div class="saved-tags" *ngIf="look.occasionTags.length > 0">
+                <span *ngFor="let tag of look.occasionTags">{{ tag }}</span>
+              </div>
+            </div>
+            <div class="saved-items">
+              <img *ngIf="look.heroImageUrl; else lookFallback" [src]="look.heroImageUrl" [alt]="look.name">
+              <ng-template #lookFallback>
+                <img *ngFor="let item of look.items | slice:0:3" [src]="item.imageUrl" [alt]="item.name">
+              </ng-template>
+            </div>
+            <div class="saved-actions">
+              <ion-button fill="clear" size="small" (click)="toggleFavoriteLook(look, $event)">
+                {{ isFavoriteLook(look.id) ? 'Desfavoritar' : 'Favoritar' }}
+              </ion-button>
+              <ion-button fill="outline" size="small" (click)="reloadSavedLook(look)">
+                Montar novamente
+              </ion-button>
+              <ion-button fill="clear" size="small" (click)="shopSavedLook(look)">
+                Comprar
+              </ion-button>
+              <ion-button size="small" (click)="openLookDetail(look.id)">
+                Ver detalhe
+              </ion-button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <ng-template #loadingState>
+    <div class="feedback-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Montando o studio de looks...</p>
+    </div>
+  </ng-template>
+
+  <ng-template #noAvatarState>
+    <div class="empty-state inline on-hero">
+      <p>Voce precisa criar um avatar antes de montar looks por estilo.</p>
+      <ion-button fill="outline" (click)="goToCreateAvatar()">Criar avatar</ion-button>
+    </div>
+  </ng-template>
+</ion-content>
+
+
+
+
+
+
+
+
