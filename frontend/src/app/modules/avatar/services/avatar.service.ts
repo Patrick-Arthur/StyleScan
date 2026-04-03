@@ -26,6 +26,8 @@ export interface AvatarModel extends AvatarMeasurements {
   updatedAt: string;
 }
 
+export type AvatarVisualSource = 'generated' | 'reference' | 'none';
+
 export interface AvatarListResponse {
   data: AvatarModel[];
   total: number;
@@ -123,6 +125,32 @@ export class AvatarService {
     }
 
     return this.withVersion(this.resolveAbsoluteUrl(source), avatar);
+  }
+
+  resolveAvatarVisualSource(avatar: Pick<AvatarModel, 'generatedAvatarImageUrl' | 'photoUrl' | 'photoUrls'> | null | undefined): AvatarVisualSource {
+    if (this.isRenderableImageSource(avatar?.generatedAvatarImageUrl)) {
+      return 'generated';
+    }
+
+    if (this.isRenderableImageSource(avatar?.photoUrl) || (avatar?.photoUrls ?? []).some(photo => this.isRenderableImageSource(photo))) {
+      return 'reference';
+    }
+
+    return 'none';
+  }
+
+  resolveAvatarVisualLabel(avatar: Pick<AvatarModel, 'generatedAvatarImageUrl' | 'photoUrl' | 'photoUrls'> | null | undefined): string {
+    const source = this.resolveAvatarVisualSource(avatar);
+
+    if (source === 'generated') {
+      return 'Avatar IA';
+    }
+
+    if (source === 'reference') {
+      return 'Foto-base';
+    }
+
+    return 'Sem visual';
   }
 
   resolveAvatarGallery(avatar: Pick<AvatarModel, 'photoUrls' | 'photoUrl' | 'updatedAt'> | null | undefined): string[] {

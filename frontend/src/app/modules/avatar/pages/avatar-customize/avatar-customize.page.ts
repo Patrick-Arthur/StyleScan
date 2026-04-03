@@ -24,6 +24,7 @@ export class AvatarCustomizePage implements OnInit {
   error = '';
   photoPreview = '';
   photoGallery: string[] = [];
+  brokenPhotoGalleryUrls = new Set<string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -148,6 +149,19 @@ export class AvatarCustomizePage implements OnInit {
     return this.avatarService.resolveAvatarImageUrl(this.avatar);
   }
 
+  get visiblePhotoGallery(): string[] {
+    return this.photoGallery.filter(photo => !this.brokenPhotoGalleryUrls.has(photo));
+  }
+
+  get avatarVisualLabel(): string {
+    return this.avatarService.resolveAvatarVisualLabel(this.avatar);
+  }
+
+  onGalleryImageError(photoUrl: string): void {
+    this.brokenPhotoGalleryUrls.add(photoUrl);
+    this.brokenPhotoGalleryUrls = new Set(this.brokenPhotoGalleryUrls);
+  }
+
   async generateAvatar2d(): Promise<void> {
     if (!this.avatarId) {
       return;
@@ -174,6 +188,7 @@ export class AvatarCustomizePage implements OnInit {
 
     this.photoPreview = this.avatarService.resolveAvatarImageUrl(this.avatar);
     this.photoGallery = this.avatarService.resolveAvatarGallery(this.avatar);
+    this.brokenPhotoGalleryUrls = new Set();
     this.avatarForm.patchValue({
       name: this.avatar.name,
       gender: this.avatar.gender,

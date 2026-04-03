@@ -148,9 +148,17 @@ export class LooksListPage implements OnInit {
     return this.avatarService.resolveAvatarImageUrl(this.currentAvatar);
   }
 
+  get currentAvatarVisualLabel(): string {
+    return this.avatarService.resolveAvatarVisualLabel(this.currentAvatar);
+  }
+
+  get usingReferenceFallback(): boolean {
+    return this.avatarService.resolveAvatarVisualSource(this.currentAvatar) === 'reference';
+  }
+
   get stageImageUrl(): string {
     const avatarGallery = this.avatarService.resolveAvatarGallery(this.currentAvatar);
-    const avatarFallback = avatarGallery[0] || this.currentAvatarImageUrl;
+    const avatarFallback = this.currentAvatarImageUrl || avatarGallery[0];
     const candidates = this.stageViewMode === 'base'
       ? [avatarFallback, ...avatarGallery]
       : [this.tryOnPreviewUrl, avatarFallback, ...avatarGallery];
@@ -550,13 +558,15 @@ export class LooksListPage implements OnInit {
       this.favoriteLookIds = new Set(favoriteResponse.data.map(look => look.id));
       this.manualCollections = collectionsResponse.data;
 
-      if (this.avatars.length > 0 && !this.selectedAvatarId) {
-        this.selectedAvatarId = this.avatars[0].id;
-      }
+        if (this.avatars.length > 0 && !this.selectedAvatarId) {
+          this.selectedAvatarId = this.avatars[0].id;
+        }
 
-      if (!this.customLookName) {
-        this.customLookName = this.suggestedLookName;
-      }
+        await this.hydrateSelectedAvatar();
+
+        if (!this.customLookName) {
+          this.customLookName = this.suggestedLookName;
+        }
 
       this.restoreLookFromRoute();
       this.applyBoard(this.selectedBoardId);
@@ -581,6 +591,7 @@ export class LooksListPage implements OnInit {
   }
 
   async onAvatarChange(): Promise<void> {
+    await this.hydrateSelectedAvatar();
     this.resetPreviewState();
     this.stageViewMode = 'result';
     this.selectedComparisonPreviewId = '';
@@ -1002,6 +1013,7 @@ export class LooksListPage implements OnInit {
 
     this.lastSavedSelectionKey = this.buildSelectionKey(look.avatarId, this.selectedBoardId, look.items.map(item => item.id));
     this.applyBoard(this.selectedBoardId);
+    void this.hydrateSelectedAvatar();
     void this.loadPreviewHistory();
     this.customLookName = look.name;
     this.customLookNote = look.note ?? '';
@@ -1012,6 +1024,7 @@ export class LooksListPage implements OnInit {
   applyPreviewHistoryItem(item: TryOnPreviewHistoryModel): void {
     if (this.selectedAvatarId !== item.avatarId) {
       this.selectedAvatarId = item.avatarId;
+      void this.hydrateSelectedAvatar();
     }
 
     if (item.boardId && this.boards.some(board => board.id === item.boardId)) {
@@ -1166,6 +1179,26 @@ export class LooksListPage implements OnInit {
       heroPreviewMode: this.tryOnPreviewUrl ? this.tryOnMode : undefined,
       productIds: this.selectedProducts.map(product => product.id)
     };
+  }
+
+  private async hydrateSelectedAvatar(): Promise<void> {
+    if (!this.selectedAvatarId) {
+      return;
+    }
+
+    try {
+      const avatar = await firstValueFrom(this.avatarService.getAvatarById(this.selectedAvatarId));
+      const avatarIndex = this.avatars.findIndex(existingAvatar => existingAvatar.id === avatar.id);
+
+      if (avatarIndex >= 0) {
+        this.avatars = this.avatars.map((existingAvatar, index) => index === avatarIndex ? avatar : existingAvatar);
+        return;
+      }
+
+      this.avatars = [...this.avatars, avatar];
+    } catch (error) {
+      console.error('Nao foi possivel hidratar o avatar selecionado no studio.', error);
+    }
   }
 
   private restoreLookFromRoute(): void {

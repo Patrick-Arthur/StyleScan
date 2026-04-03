@@ -41,6 +41,9 @@
               <span class="eyebrow">Avatar Spotlight</span>
               <h2>{{ primaryAvatar?.name || firstName }}</h2>
             </div>
+            <div class="visual-status" *ngIf="primaryAvatar">
+              <span>{{ primaryAvatarVisualLabel }}</span>
+            </div>
             <button type="button" class="ghost-link" (click)="navigate(primaryAvatar ? '/avatar/list' : '/avatar/create')">
               {{ primaryAvatar ? 'Editar' : 'Criar' }}
             </button>

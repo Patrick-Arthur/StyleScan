@@ -128,6 +128,10 @@ export class HomePage {
     return this.avatarService.resolveAvatarImageUrl(this.primaryAvatar);
   }
 
+  get primaryAvatarVisualLabel(): string {
+    return this.avatarService.resolveAvatarVisualLabel(this.primaryAvatar);
+  }
+
   get lookCountLabel(): string {
     if (this.recentLooks.length === 0) {
       return 'Nenhum look salvo ainda';

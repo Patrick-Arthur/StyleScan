@@ -17,7 +17,7 @@
               <span class="eyebrow">Avatar Studio</span>
               <h1>{{ avatar.name }}</h1>
             </div>
-            <span class="status-chip">{{ avatar.bodyType }} • {{ avatar.skinTone }}</span>
+            <span class="status-chip">{{ avatarVisualLabel }} • {{ avatar.bodyType }} • {{ avatar.skinTone }}</span>
           </div>
 
           <div class="avatar-viewer">
@@ -42,8 +42,12 @@
             </ion-button>
           </div>
 
-          <div class="photo-gallery" *ngIf="photoGallery.length > 1">
-            <img *ngFor="let photo of photoGallery" [src]="photo" alt="Referencia do avatar">
+          <div class="photo-gallery" *ngIf="visiblePhotoGallery.length > 1">
+            <img
+              *ngFor="let photo of visiblePhotoGallery"
+              [src]="photo"
+              alt="Referencia do avatar"
+              (error)="onGalleryImageError(photo)">
           </div>
         </article>
 

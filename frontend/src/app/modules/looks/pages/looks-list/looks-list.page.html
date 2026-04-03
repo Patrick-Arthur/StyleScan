@@ -130,9 +130,13 @@
 
           <div class="avatar-summary">
             <strong>{{ currentAvatar?.bodyType }}</strong>
+            <span class="avatar-visual-badge">{{ currentAvatarVisualLabel }}</span>
             <p>{{ currentAvatar?.height }} cm / {{ currentAvatar?.skinTone }} / {{ activeBoard.title }}</p>
             <ion-chip color="light" class="fit-chip" *ngFor="let item of fitHighlights">{{ item }}</ion-chip>
             <p>{{ fitNote }}</p>
+            <p class="avatar-fallback-note" *ngIf="usingReferenceFallback">
+              O studio esta usando uma foto-base enquanto o avatar IA nao estiver disponivel.
+            </p>
           </div>
 
           <div class="look-traits" *ngIf="lookTraits.length > 0">

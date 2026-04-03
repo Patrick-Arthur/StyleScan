@@ -72,6 +72,10 @@ export class AvatarListPage implements OnInit {
     return this.avatarService.resolveAvatarImageUrl(avatar);
   }
 
+  getAvatarVisualLabel(avatar: AvatarModel): string {
+    return this.avatarService.resolveAvatarVisualLabel(avatar);
+  }
+
   goToUpgrade(): void {
     this.router.navigateByUrl('/user/upgrade');
   }

@@ -100,6 +100,19 @@
   background: rgba(6, 16, 22, 0.28);
 }
 
+.visual-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(22, 36, 46, 0.08);
+  color: #28424e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .hero-actions {
   display: grid;
   gap: 12px;
