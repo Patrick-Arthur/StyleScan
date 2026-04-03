@@ -509,6 +509,8 @@ namespace StyleScan.Backend.Services.Implementations
             var skinTone = string.IsNullOrWhiteSpace(avatar.SkinTone) ? "medium" : avatar.SkinTone;
             var hasWeight = avatar.Weight > 0;
             var hasMeasurements = avatar.Height > 0 || avatar.Weight > 0 || avatar.Chest > 0 || avatar.Waist > 0 || avatar.Hips > 0;
+            var measurementProfile = BuildMeasurementProfile(avatar);
+            var bodyGuardrails = BuildBodyGuardrails(avatar);
 
             return $"""
 Create a highly faithful full-body 2D fashion avatar using the reference photos as the primary source of truth.
@@ -519,6 +521,7 @@ Identity fidelity rules:
 - Match skin tone, undertone, body proportions, shoulder width, torso length, waist position, hip width, arm thickness, leg length, neck shape, and overall silhouette closely to the references.
 - Respect the body's actual volume and distribution shown in the photos, especially abdomen projection, waist softness, chest shape, upper arms, lower back, glutes, thighs, and calves.
 - Keep body mass interpretation neutral and precise. Preserve natural softness if present, but do not enlarge the torso, face, abdomen, hips, or limbs beyond what is visible in the references.
+- Treat the person as a moderate real body, not as a bulky fashion illustration or an overly soft stock character.
 - If there are multiple photos, use them to improve consistency and identity fidelity, not to average the person into a generic model.
 - Use the front, close-up, back, and side references together to preserve shape from every angle.
 - Preserve any visible asymmetry or distinctive traits that help the face and body remain recognizable.
@@ -570,6 +573,7 @@ Measurement guidance:
 - If the numeric measurements and the photos differ slightly, prefer the photos for identity and the measurements for overall scale/proportion.
 - Measurements should improve realism, not inflate body mass.
 - Never infer extra adiposity from weight alone. Use weight only as a secondary scale reference, not as permission to make the person bulkier or softer than the photos.
+- {measurementProfile}
 
 Critical fit guidance:
 - Preserve a natural male body with only the level of abdominal projection that is truly visible in the side and front photos.
@@ -580,6 +584,7 @@ Critical fit guidance:
 - Also do not turn this person into a visibly heavier version of himself.
 - When uncertain, choose the leaner of two close interpretations as long as identity and proportions remain faithful to the photos.
 - Keep the cheeks, neck, shoulder line, ribcage, abdomen, and arms visually closer to the reference photos than to the numeric weight.
+- {bodyGuardrails}
 
 Output requirements:
 - Single full-body 2D avatar image.
@@ -590,6 +595,93 @@ Output requirements:
 - The output should feel premium, recognizable, balanced, and suitable as a try-on base in a fashion app.
 - Use the provided measurements assertively to improve proportion accuracy.{(hasMeasurements ? string.Empty : " If measurements are missing, rely entirely on the photos.")}
 """;
+        }
+
+        private static string BuildMeasurementProfile(Avatar avatar)
+        {
+            var notes = new List<string>();
+
+            if (avatar.Chest > 0 && avatar.Waist > 0)
+            {
+                var chestToWaistDelta = avatar.Chest - avatar.Waist;
+                if (chestToWaistDelta >= 12)
+                {
+                    notes.Add("The chest-to-waist ratio suggests a moderately tapered torso, so avoid a square or barrel-shaped upper body.");
+                }
+                else if (chestToWaistDelta >= 6)
+                {
+                    notes.Add("The torso should read balanced with a light taper, not thick through the ribcage and waist.");
+                }
+                else
+                {
+                    notes.Add("The torso should stay straight and moderate, without exaggerating the waist or chest volume.");
+                }
+            }
+
+            if (avatar.Waist > 0 && avatar.Hips > 0)
+            {
+                var waistToHipDelta = avatar.Hips - avatar.Waist;
+                if (waistToHipDelta >= 10)
+                {
+                    notes.Add("The lower body can be slightly fuller than the waist, but should remain natural and not heavy.");
+                }
+                else
+                {
+                    notes.Add("The waist and hips should stay visually close, with no extra widening added by the model.");
+                }
+            }
+
+            if (avatar.Height > 0 && avatar.Weight > 0)
+            {
+                var bmi = avatar.Weight / Math.Pow(avatar.Height / 100d, 2);
+                if (bmi < 22)
+                {
+                    notes.Add("Overall mass should read lean-to-moderate, not heavy.");
+                }
+                else if (bmi < 26)
+                {
+                    notes.Add("Overall mass should read moderate and natural, with limited softness.");
+                }
+                else
+                {
+                    notes.Add("Overall mass can read softly built, but still should avoid puffiness or extra fullness beyond the photos.");
+                }
+            }
+
+            return notes.Count == 0
+                ? "Keep proportions moderate and faithful to the photos."
+                : string.Join(" ", notes);
+        }
+
+        private static string BuildBodyGuardrails(Avatar avatar)
+        {
+            var notes = new List<string>();
+
+            if (avatar.Gender.Contains("male", StringComparison.OrdinalIgnoreCase) || avatar.Gender.Contains("masc", StringComparison.OrdinalIgnoreCase))
+            {
+                notes.Add("For this male body, avoid thickening the neck, widening the ribcage, or rounding the abdomen beyond the source photos.");
+            }
+
+            if (avatar.BodyType.Contains("average", StringComparison.OrdinalIgnoreCase))
+            {
+                notes.Add("Average here means balanced and medium-built, not broad, chunky, or plush.");
+            }
+            else if (avatar.BodyType.Contains("athletic", StringComparison.OrdinalIgnoreCase))
+            {
+                notes.Add("Athletic here should read structured and toned, not bodybuilder-wide.");
+            }
+            else if (avatar.BodyType.Contains("slim", StringComparison.OrdinalIgnoreCase))
+            {
+                notes.Add("Slim here should stay natural, not fashion-model thin.");
+            }
+            else if (avatar.BodyType.Contains("curvy", StringComparison.OrdinalIgnoreCase))
+            {
+                notes.Add("Curvy here should stay softly shaped, not exaggerated.");
+            }
+
+            return notes.Count == 0
+                ? "Keep the silhouette balanced and moderate."
+                : string.Join(" ", notes);
         }
 
         private static string BuildAvatarAnalysisPrompt()

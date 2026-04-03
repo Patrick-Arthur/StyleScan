@@ -1193,6 +1193,8 @@ namespace StyleScan.Backend.Services.Implementations
             var boardDirectives = BuildBoardDirection(boardId, style, occasion, palette);
             var referenceDirectives = BuildReferenceDirectives(referenceCount, normalizedMode);
             var compositionDirectives = BuildCompositionDirectives(products);
+            var silhouetteDirectives = BuildSilhouetteDirectives(avatar, normalizedMode);
+            var fitAnchors = BuildFitAnchors(avatar, products);
 
             if (normalizedMode == "realistic")
             {
@@ -1206,6 +1208,7 @@ Identity rules:
 - Keep the body reading natural, moderate, and respectful.
 - Keep the person recognizable as the same individual in the references.
 - {referenceDirectives}
+- {silhouetteDirectives}
 
 Wardrobe rules:
 - Dress the same person using the selected products as the wardrobe references.
@@ -1218,6 +1221,7 @@ Wardrobe rules:
 - {boardDirectives}
 - {garmentDirectives}
 - {compositionDirectives}
+- {fitAnchors}
 
 Composition rules:
 - Full body visible from head to toe.
@@ -1238,6 +1242,7 @@ Identity rules:
 - Keep the body reading natural and moderate.
 - Keep the face and body recognizably consistent with the source person.
 - {referenceDirectives}
+- {silhouetteDirectives}
 
 Wardrobe rules:
 - Dress the same person using the selected clothing items as the wardrobe reference.
@@ -1251,6 +1256,7 @@ Wardrobe rules:
 - {boardDirectives}
 - {garmentDirectives}
 - {compositionDirectives}
+- {fitAnchors}
 
 Composition rules:
 - Full body visible from head to toe.
@@ -1362,6 +1368,80 @@ Composition rules:
 
             return notes.Count == 0
                 ? "Keep the outfit readable, balanced, and faithful to the selected pieces."
+                : string.Join(" ", notes);
+        }
+
+        private static string BuildSilhouetteDirectives(Avatar avatar, string mode)
+        {
+            var notes = new List<string>();
+
+            if (avatar.Chest > 0 && avatar.Waist > 0)
+            {
+                var chestToWaistDelta = avatar.Chest - avatar.Waist;
+                if (chestToWaistDelta >= 10)
+                {
+                    notes.Add("Maintain a moderately tapered torso and avoid widening the waist or making the chest blocky.");
+                }
+                else
+                {
+                    notes.Add("Keep the torso straight and moderate, with no extra bulk added through the ribcage or abdomen.");
+                }
+            }
+
+            if (avatar.Height > 0 && avatar.Weight > 0)
+            {
+                var bmi = avatar.Weight / Math.Pow(avatar.Height / 100d, 2);
+                if (bmi < 26)
+                {
+                    notes.Add("Overall body mass should stay lean-to-moderate and never puffier than the references.");
+                }
+                else
+                {
+                    notes.Add("Keep the body softly built but controlled, without extra fullness in the face, arms, or waist.");
+                }
+            }
+
+            if (mode == "avatar" && !string.IsNullOrWhiteSpace(avatar.GeneratedAvatarImageUrl))
+            {
+                notes.Add("Use the generated avatar silhouette as the primary body-shape anchor, then keep face and proportions aligned with the original photos.");
+            }
+
+            return notes.Count == 0
+                ? "Keep the silhouette faithful, moderate, and free of extra body mass."
+                : string.Join(" ", notes);
+        }
+
+        private static string BuildFitAnchors(Avatar avatar, List<Clothing> products)
+        {
+            var notes = new List<string>();
+
+            if (products.Any(product => product.Category.Equals("top", StringComparison.OrdinalIgnoreCase)))
+            {
+                notes.Add("Tops should sit naturally on the shoulders and chest, without inflating the torso.");
+            }
+
+            if (products.Any(product => product.Category.Equals("bottom", StringComparison.OrdinalIgnoreCase)))
+            {
+                notes.Add("Bottoms should meet the real waist position and hip width, without lowering or widening the midsection.");
+            }
+
+            if (products.Any(product => product.Category.Equals("dress", StringComparison.OrdinalIgnoreCase)))
+            {
+                notes.Add("If the outfit uses a dress, keep the dress line faithful to the person's true torso and hip shape instead of smoothing the body into a mannequin.");
+            }
+
+            if (products.Any(product => product.Category.Equals("shoes", StringComparison.OrdinalIgnoreCase)))
+            {
+                notes.Add("Footwear should remain proportionate to the legs and feet, not oversized or cropped.");
+            }
+
+            if (avatar.Waist > 0)
+            {
+                notes.Add($"Use the waist anchor of about {avatar.Waist:0.#} cm only to preserve proportion, not to exaggerate softness.");
+            }
+
+            return notes.Count == 0
+                ? "Keep garment fit natural and proportional to the real body."
                 : string.Join(" ", notes);
         }
 
