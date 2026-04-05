@@ -511,6 +511,7 @@ namespace StyleScan.Backend.Services.Implementations
             var hasMeasurements = avatar.Height > 0 || avatar.Weight > 0 || avatar.Chest > 0 || avatar.Waist > 0 || avatar.Hips > 0;
             var measurementProfile = BuildMeasurementProfile(avatar);
             var bodyGuardrails = BuildBodyGuardrails(avatar);
+            var regionalGuardrails = BuildRegionalFitGuardrails(avatar);
 
             return $"""
 Create a highly faithful full-body 2D fashion avatar using the reference photos as the primary source of truth.
@@ -585,6 +586,7 @@ Critical fit guidance:
 - When uncertain, choose the leaner of two close interpretations as long as identity and proportions remain faithful to the photos.
 - Keep the cheeks, neck, shoulder line, ribcage, abdomen, and arms visually closer to the reference photos than to the numeric weight.
 - {bodyGuardrails}
+- {regionalGuardrails}
 
 Output requirements:
 - Single full-body 2D avatar image.
@@ -682,6 +684,31 @@ Output requirements:
             return notes.Count == 0
                 ? "Keep the silhouette balanced and moderate."
                 : string.Join(" ", notes);
+        }
+
+        private static string BuildRegionalFitGuardrails(Avatar avatar)
+        {
+            var notes = new List<string>();
+
+            notes.Add("Keep shoulders medium and natural, with no broadening beyond the photos.");
+            notes.Add("Keep chest volume moderate and close to the front view, without puffing the upper torso.");
+            notes.Add("Keep the abdomen only mildly projected if visible in the side photo, never round or full.");
+            notes.Add("Keep the waist closer to the real side silhouette, without widening it into a soft cylinder.");
+            notes.Add("Keep upper arms medium and natural, without adding muscular or soft bulk.");
+            notes.Add("Keep thighs and calves proportional to the photos, without athletic thickness or extra fullness.");
+            notes.Add("Keep the face lean-to-moderate, avoiding fuller cheeks, thicker neck, or a heavier jaw than the references.");
+
+            if (avatar.Weight > 0)
+            {
+                notes.Add("Use weight only as a weak scale hint; it must never override the photographed torso, waist, or leg shape.");
+            }
+
+            if (avatar.Waist > 0 && avatar.Chest > 0)
+            {
+                notes.Add($"The measured chest-to-waist difference should preserve definition through the torso; do not visually collapse it into a wide midsection.");
+            }
+
+            return string.Join(" ", notes);
         }
 
         private static string BuildAvatarAnalysisPrompt()
