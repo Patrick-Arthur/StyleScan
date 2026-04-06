@@ -769,25 +769,30 @@ Return strict JSON with:
                 : $"<image href=\"..{cover}\" x=\"86\" y=\"64\" width=\"268\" height=\"248\" preserveAspectRatio=\"xMidYMid slice\" clip-path=\"url(#portraitMask)\" opacity=\"0.82\" />";
 
             const double centerX = 220;
-            const double headCenterY = 234;
-            const double shoulderY = 292;
-            const double chestY = 326;
-            const double waistY = 404;
-            const double hipY = 460;
-            const double crotchY = 520;
-            const double kneeY = 602;
+            const double headCenterY = 228;
+            const double shoulderY = 288;
+            const double chestY = 338;
+            const double waistY = 418;
+            const double hipY = 470;
+            const double crotchY = 528;
+            const double kneeY = 610;
             const double ankleY = 686;
 
-            var headRadius = Clamp(avatar.Height * 0.22, 48, 56);
-            var neckWidth = Clamp(avatar.Chest * 0.16, 26, 38);
-            var shoulderWidth = Clamp(avatar.Chest * 1.28, 128, 172);
-            var chestWidth = Clamp(avatar.Chest * 1.08, 104, 148);
-            var waistWidth = Clamp(avatar.Waist * 1.02, 84, 136);
-            var hipWidth = Clamp(avatar.Hips * 1.02, 94, 142);
-            var armWidth = Clamp((avatar.Chest - avatar.Waist) * 0.42 + 26, 24, 36);
-            var thighWidth = Clamp(avatar.Hips * 0.26, 28, 40);
-            var calfWidth = Clamp(thighWidth * 0.74, 20, 30);
-            var forearmWidth = Clamp(armWidth * 0.84, 20, 30);
+            var effectiveHeight = avatar.Height > 0 ? avatar.Height : 178;
+            var effectiveChest = avatar.Chest > 0 ? avatar.Chest : 96;
+            var effectiveWaist = avatar.Waist > 0 ? avatar.Waist : 84;
+            var effectiveHips = avatar.Hips > 0 ? avatar.Hips : 98;
+
+            var headRadius = Clamp(effectiveHeight * 0.155, 46, 52);
+            var neckWidth = Clamp(effectiveChest * 0.19, 28, 36);
+            var shoulderWidth = Clamp(effectiveChest * 1.55, 142, 170);
+            var chestWidth = Clamp(effectiveChest * 1.28, 118, 148);
+            var waistWidth = Clamp((effectiveWaist * 1.18) + Math.Max(0, effectiveChest - effectiveWaist) * 0.18, 106, 134);
+            var hipWidth = Clamp(effectiveHips * 1.18, 114, 142);
+            var armWidth = Clamp(chestWidth * 0.23, 24, 32);
+            var thighWidth = Clamp(hipWidth * 0.25, 30, 38);
+            var calfWidth = Clamp(thighWidth * 0.78, 22, 30);
+            var forearmWidth = Clamp(armWidth * 0.84, 20, 28);
             var shoulderOffset = shoulderWidth / 2;
             var chestOffset = chestWidth / 2;
             var waistOffset = waistWidth / 2;
@@ -798,74 +803,74 @@ Return strict JSON with:
 
             var torsoPath = $"""
 M {centerX - shoulderOffset},{shoulderY}
-C {centerX - shoulderOffset + 8},{shoulderY - 8} {centerX - chestOffset - 6},{chestY - 10} {centerX - chestOffset},{chestY}
-L {centerX - waistOffset},{waistY}
-C {centerX - waistOffset + 2},{waistY + 18} {centerX - hipOffset + 6},{hipY - 10} {centerX - hipOffset},{hipY}
-L {centerX - thighWidth - 10},{crotchY}
-L {centerX + thighWidth + 10},{crotchY}
+C {centerX - shoulderOffset + 14},{shoulderY - 6} {centerX - chestOffset - 10},{chestY - 18} {centerX - chestOffset},{chestY}
+C {centerX - chestOffset + 4},{chestY + 28} {centerX - waistOffset - 2},{waistY - 10} {centerX - waistOffset},{waistY}
+C {centerX - waistOffset + 4},{waistY + 24} {centerX - hipOffset + 8},{hipY - 8} {centerX - hipOffset},{hipY}
+L {centerX - thighWidth - 14},{crotchY}
+L {centerX + thighWidth + 14},{crotchY}
 L {centerX + hipOffset},{hipY}
-C {centerX + hipOffset - 6},{hipY - 10} {centerX + waistOffset - 2},{waistY + 18} {centerX + waistOffset},{waistY}
-L {centerX + chestOffset},{chestY}
-C {centerX + chestOffset - 6},{chestY - 10} {centerX + shoulderOffset - 8},{shoulderY - 8} {centerX + shoulderOffset},{shoulderY}
+C {centerX + hipOffset - 8},{hipY - 8} {centerX + waistOffset - 4},{waistY + 24} {centerX + waistOffset},{waistY}
+C {centerX + waistOffset + 2},{waistY - 10} {centerX + chestOffset - 4},{chestY + 28} {centerX + chestOffset},{chestY}
+C {centerX + chestOffset + 10},{chestY - 18} {centerX + shoulderOffset - 14},{shoulderY - 6} {centerX + shoulderOffset},{shoulderY}
 Z
 """;
 
             var leftArmPath = $"""
-M {centerX - shoulderOffset + 6},{shoulderY + 8}
-C {centerX - shoulderOffset - 10},{shoulderY + 26} {centerX - shoulderOffset - 18},{shoulderY + 62} {centerX - shoulderOffset - 16},{shoulderY + 100}
-L {centerX - shoulderOffset - 12},{waistY + 72}
-C {centerX - shoulderOffset - 10},{waistY + 100} {centerX - shoulderOffset + 4},{waistY + 120} {centerX - shoulderOffset + 18},{waistY + 118}
-L {centerX - shoulderOffset + 28},{waistY + 116}
-C {centerX - shoulderOffset + 18},{waistY + 84} {centerX - shoulderOffset + 12},{waistY + 48} {centerX - shoulderOffset + 10},{waistY + 12}
-L {centerX - shoulderOffset + 16},{shoulderY + 54}
-C {centerX - shoulderOffset + 18},{shoulderY + 32} {centerX - shoulderOffset + 18},{shoulderY + 16} {centerX - shoulderOffset + 6},{shoulderY + 8}
+M {centerX - shoulderOffset + 6},{shoulderY + 10}
+C {centerX - shoulderOffset - 14},{shoulderY + 34} {centerX - shoulderOffset - 18},{shoulderY + 78} {centerX - shoulderOffset - 10},{shoulderY + 120}
+L {centerX - shoulderOffset + 2},{waistY + 84}
+C {centerX - shoulderOffset + 10},{waistY + 112} {centerX - shoulderOffset + 24},{waistY + 126} {centerX - shoulderOffset + 38},{waistY + 120}
+L {centerX - shoulderOffset + 46},{waistY + 116}
+C {centerX - shoulderOffset + 30},{waistY + 84} {centerX - shoulderOffset + 20},{waistY + 46} {centerX - shoulderOffset + 18},{shoulderY + 54}
+L {centerX - shoulderOffset + 20},{shoulderY + 24}
+C {centerX - shoulderOffset + 20},{shoulderY + 14} {centerX - shoulderOffset + 14},{shoulderY + 8} {centerX - shoulderOffset + 6},{shoulderY + 10}
 Z
 """;
 
             var rightArmPath = $"""
-M {centerX + shoulderOffset - 6},{shoulderY + 8}
-C {centerX + shoulderOffset + 10},{shoulderY + 26} {centerX + shoulderOffset + 18},{shoulderY + 62} {centerX + shoulderOffset + 16},{shoulderY + 100}
-L {centerX + shoulderOffset + 12},{waistY + 72}
-C {centerX + shoulderOffset + 10},{waistY + 100} {centerX + shoulderOffset - 4},{waistY + 120} {centerX + shoulderOffset - 18},{waistY + 118}
-L {centerX + shoulderOffset - 28},{waistY + 116}
-C {centerX + shoulderOffset - 18},{waistY + 84} {centerX + shoulderOffset - 12},{waistY + 48} {centerX + shoulderOffset - 10},{waistY + 12}
-L {centerX + shoulderOffset - 16},{shoulderY + 54}
-C {centerX + shoulderOffset - 18},{shoulderY + 32} {centerX + shoulderOffset - 18},{shoulderY + 16} {centerX + shoulderOffset - 6},{shoulderY + 8}
+M {centerX + shoulderOffset - 6},{shoulderY + 10}
+C {centerX + shoulderOffset + 14},{shoulderY + 34} {centerX + shoulderOffset + 18},{shoulderY + 78} {centerX + shoulderOffset + 10},{shoulderY + 120}
+L {centerX + shoulderOffset - 2},{waistY + 84}
+C {centerX + shoulderOffset - 10},{waistY + 112} {centerX + shoulderOffset - 24},{waistY + 126} {centerX + shoulderOffset - 38},{waistY + 120}
+L {centerX + shoulderOffset - 46},{waistY + 116}
+C {centerX + shoulderOffset - 30},{waistY + 84} {centerX + shoulderOffset - 20},{waistY + 46} {centerX + shoulderOffset - 18},{shoulderY + 54}
+L {centerX + shoulderOffset - 20},{shoulderY + 24}
+C {centerX + shoulderOffset - 20},{shoulderY + 14} {centerX + shoulderOffset - 14},{shoulderY + 8} {centerX + shoulderOffset - 6},{shoulderY + 10}
 Z
 """;
 
             var leftLegPath = $"""
-M {centerX - 18},{crotchY}
-C {centerX - thighWidth - 2},{crotchY + 18} {centerX - thighWidth},{kneeY - 24} {centerX - calfWidth},{ankleY}
-L {centerX - calfWidth + 12},{ankleY}
-C {centerX - thighWidth + 6},{kneeY - 16} {centerX - 2},{crotchY + 40} {centerX + 2},{crotchY + 6}
+M {centerX - 16},{crotchY}
+C {centerX - thighWidth - 8},{crotchY + 24} {centerX - thighWidth},{kneeY - 26} {centerX - calfWidth - 2},{ankleY}
+L {centerX - calfWidth + 14},{ankleY}
+C {centerX - thighWidth + 8},{kneeY - 18} {centerX - 2},{crotchY + 48} {centerX + 4},{crotchY + 10}
 Z
 """;
 
             var rightLegPath = $"""
-M {centerX + 18},{crotchY}
-C {centerX + thighWidth + 2},{crotchY + 18} {centerX + thighWidth},{kneeY - 24} {centerX + calfWidth},{ankleY}
-L {centerX + calfWidth - 12},{ankleY}
-C {centerX + thighWidth - 6},{kneeY - 16} {centerX + 2},{crotchY + 40} {centerX - 2},{crotchY + 6}
+M {centerX + 16},{crotchY}
+C {centerX + thighWidth + 8},{crotchY + 24} {centerX + thighWidth},{kneeY - 26} {centerX + calfWidth + 2},{ankleY}
+L {centerX + calfWidth - 14},{ankleY}
+C {centerX + thighWidth - 8},{kneeY - 18} {centerX + 2},{crotchY + 48} {centerX - 4},{crotchY + 10}
 Z
 """;
 
             var shortsPath = $"""
-M {centerX - hipOffset + 8},{hipY - 18}
-L {centerX + hipOffset - 8},{hipY - 18}
-C {centerX + hipOffset - 2},{hipY + 10} {centerX + hipOffset - 6},{crotchY - 6} {centerX + 20},{crotchY + 18}
-L {centerX - 20},{crotchY + 18}
-C {centerX - hipOffset + 6},{crotchY - 6} {centerX - hipOffset + 2},{hipY + 10} {centerX - hipOffset + 8},{hipY - 18}
+M {centerX - hipOffset + 10},{hipY - 20}
+L {centerX + hipOffset - 10},{hipY - 20}
+C {centerX + hipOffset - 4},{hipY + 12} {centerX + hipOffset - 10},{crotchY - 2} {centerX + 26},{crotchY + 22}
+L {centerX - 26},{crotchY + 22}
+C {centerX - hipOffset + 10},{crotchY - 2} {centerX - hipOffset + 4},{hipY + 12} {centerX - hipOffset + 10},{hipY - 20}
 Z
 """;
 
             var tankPath = $"""
-M {centerX - chestOffset + 10},{chestY - 6}
-Q {centerX - 26},{chestY - 38} {centerX - 6},{chestY - 40}
-Q {centerX},{chestY - 16} {centerX + 6},{chestY - 40}
-Q {centerX + 26},{chestY - 38} {centerX + chestOffset - 10},{chestY - 6}
-L {centerX + waistOffset - 8},{hipY - 18}
-L {centerX - waistOffset + 8},{hipY - 18}
+M {centerX - chestOffset + 12},{chestY - 10}
+Q {centerX - 28},{chestY - 42} {centerX - 8},{chestY - 42}
+Q {centerX},{chestY - 14} {centerX + 8},{chestY - 42}
+Q {centerX + 28},{chestY - 42} {centerX + chestOffset - 12},{chestY - 10}
+L {centerX + waistOffset - 10},{hipY - 20}
+L {centerX - waistOffset + 10},{hipY - 20}
 Z
 """;
 
