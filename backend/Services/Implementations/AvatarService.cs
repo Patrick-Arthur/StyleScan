@@ -172,11 +172,11 @@ namespace StyleScan.Backend.Services.Implementations
                 return null;
             }
 
-            // The avatar base is part of onboarding and iteration, so it should not
-            // consume the user's monthly realistic-render quota. That quota remains
-            // enforced for realistic try-on generations inside the looks flow.
-            avatar.GeneratedAvatarImageUrl = await TryGenerateWithOpenAiAsync(avatar)
-                ?? await CreateGeneratedAvatarAssetAsync(avatar);
+            // The base avatar should be deterministic and proportion-driven so the
+            // silhouette stays stable across retries. Realistic generation remains
+            // available in the try-on flow, but the avatar-base itself should not
+            // depend on the image model "guessing" body mass.
+            avatar.GeneratedAvatarImageUrl = await CreateGeneratedAvatarAssetAsync(avatar);
             avatar.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -761,14 +761,116 @@ Return strict JSON with:
             var accent = ResolveAccentColor(avatar.Gender, avatar.BodyType);
             var outline = ResolveOutlineColor(accent);
             var cover = avatar.PhotoUrls.FirstOrDefault() ?? avatar.PhotoUrl;
+            var portrait = avatar.PhotoUrls.Count > 1 ? avatar.PhotoUrls[1] : cover;
             var safeName = SecurityElement.Escape(avatar.Name) ?? "Avatar";
             var safeBodyType = SecurityElement.Escape(avatar.BodyType) ?? "Personalizado";
             var coverImage = string.IsNullOrWhiteSpace(cover)
                 ? string.Empty
                 : $"<image href=\"..{cover}\" x=\"86\" y=\"64\" width=\"268\" height=\"248\" preserveAspectRatio=\"xMidYMid slice\" clip-path=\"url(#portraitMask)\" opacity=\"0.82\" />";
 
+            const double centerX = 220;
+            const double headCenterY = 234;
+            const double shoulderY = 292;
+            const double chestY = 326;
+            const double waistY = 404;
+            const double hipY = 460;
+            const double crotchY = 520;
+            const double kneeY = 602;
+            const double ankleY = 686;
+
+            var headRadius = Clamp(avatar.Height * 0.22, 48, 56);
+            var neckWidth = Clamp(avatar.Chest * 0.16, 26, 38);
+            var shoulderWidth = Clamp(avatar.Chest * 1.28, 128, 172);
+            var chestWidth = Clamp(avatar.Chest * 1.08, 104, 148);
+            var waistWidth = Clamp(avatar.Waist * 1.02, 84, 136);
+            var hipWidth = Clamp(avatar.Hips * 1.02, 94, 142);
+            var armWidth = Clamp((avatar.Chest - avatar.Waist) * 0.42 + 26, 24, 36);
+            var thighWidth = Clamp(avatar.Hips * 0.26, 28, 40);
+            var calfWidth = Clamp(thighWidth * 0.74, 20, 30);
+            var forearmWidth = Clamp(armWidth * 0.84, 20, 30);
+            var shoulderOffset = shoulderWidth / 2;
+            var chestOffset = chestWidth / 2;
+            var waistOffset = waistWidth / 2;
+            var hipOffset = hipWidth / 2;
+            var portraitImage = string.IsNullOrWhiteSpace(portrait)
+                ? string.Empty
+                : $"<image href=\"..{portrait}\" x=\"{centerX - headRadius}\" y=\"{headCenterY - headRadius}\" width=\"{headRadius * 2}\" height=\"{headRadius * 2}\" preserveAspectRatio=\"xMidYMid slice\" clip-path=\"url(#headClip)\" />";
+
+            var torsoPath = $"""
+M {centerX - shoulderOffset},{shoulderY}
+C {centerX - shoulderOffset + 8},{shoulderY - 8} {centerX - chestOffset - 6},{chestY - 10} {centerX - chestOffset},{chestY}
+L {centerX - waistOffset},{waistY}
+C {centerX - waistOffset + 2},{waistY + 18} {centerX - hipOffset + 6},{hipY - 10} {centerX - hipOffset},{hipY}
+L {centerX - thighWidth - 10},{crotchY}
+L {centerX + thighWidth + 10},{crotchY}
+L {centerX + hipOffset},{hipY}
+C {centerX + hipOffset - 6},{hipY - 10} {centerX + waistOffset - 2},{waistY + 18} {centerX + waistOffset},{waistY}
+L {centerX + chestOffset},{chestY}
+C {centerX + chestOffset - 6},{chestY - 10} {centerX + shoulderOffset - 8},{shoulderY - 8} {centerX + shoulderOffset},{shoulderY}
+Z
+""";
+
+            var leftArmPath = $"""
+M {centerX - shoulderOffset + 6},{shoulderY + 8}
+C {centerX - shoulderOffset - 10},{shoulderY + 26} {centerX - shoulderOffset - 18},{shoulderY + 62} {centerX - shoulderOffset - 16},{shoulderY + 100}
+L {centerX - shoulderOffset - 12},{waistY + 72}
+C {centerX - shoulderOffset - 10},{waistY + 100} {centerX - shoulderOffset + 4},{waistY + 120} {centerX - shoulderOffset + 18},{waistY + 118}
+L {centerX - shoulderOffset + 28},{waistY + 116}
+C {centerX - shoulderOffset + 18},{waistY + 84} {centerX - shoulderOffset + 12},{waistY + 48} {centerX - shoulderOffset + 10},{waistY + 12}
+L {centerX - shoulderOffset + 16},{shoulderY + 54}
+C {centerX - shoulderOffset + 18},{shoulderY + 32} {centerX - shoulderOffset + 18},{shoulderY + 16} {centerX - shoulderOffset + 6},{shoulderY + 8}
+Z
+""";
+
+            var rightArmPath = $"""
+M {centerX + shoulderOffset - 6},{shoulderY + 8}
+C {centerX + shoulderOffset + 10},{shoulderY + 26} {centerX + shoulderOffset + 18},{shoulderY + 62} {centerX + shoulderOffset + 16},{shoulderY + 100}
+L {centerX + shoulderOffset + 12},{waistY + 72}
+C {centerX + shoulderOffset + 10},{waistY + 100} {centerX + shoulderOffset - 4},{waistY + 120} {centerX + shoulderOffset - 18},{waistY + 118}
+L {centerX + shoulderOffset - 28},{waistY + 116}
+C {centerX + shoulderOffset - 18},{waistY + 84} {centerX + shoulderOffset - 12},{waistY + 48} {centerX + shoulderOffset - 10},{waistY + 12}
+L {centerX + shoulderOffset - 16},{shoulderY + 54}
+C {centerX + shoulderOffset - 18},{shoulderY + 32} {centerX + shoulderOffset - 18},{shoulderY + 16} {centerX + shoulderOffset - 6},{shoulderY + 8}
+Z
+""";
+
+            var leftLegPath = $"""
+M {centerX - 18},{crotchY}
+C {centerX - thighWidth - 2},{crotchY + 18} {centerX - thighWidth},{kneeY - 24} {centerX - calfWidth},{ankleY}
+L {centerX - calfWidth + 12},{ankleY}
+C {centerX - thighWidth + 6},{kneeY - 16} {centerX - 2},{crotchY + 40} {centerX + 2},{crotchY + 6}
+Z
+""";
+
+            var rightLegPath = $"""
+M {centerX + 18},{crotchY}
+C {centerX + thighWidth + 2},{crotchY + 18} {centerX + thighWidth},{kneeY - 24} {centerX + calfWidth},{ankleY}
+L {centerX + calfWidth - 12},{ankleY}
+C {centerX + thighWidth - 6},{kneeY - 16} {centerX + 2},{crotchY + 40} {centerX - 2},{crotchY + 6}
+Z
+""";
+
+            var shortsPath = $"""
+M {centerX - hipOffset + 8},{hipY - 18}
+L {centerX + hipOffset - 8},{hipY - 18}
+C {centerX + hipOffset - 2},{hipY + 10} {centerX + hipOffset - 6},{crotchY - 6} {centerX + 20},{crotchY + 18}
+L {centerX - 20},{crotchY + 18}
+C {centerX - hipOffset + 6},{crotchY - 6} {centerX - hipOffset + 2},{hipY + 10} {centerX - hipOffset + 8},{hipY - 18}
+Z
+""";
+
+            var tankPath = $"""
+M {centerX - chestOffset + 10},{chestY - 6}
+Q {centerX - 26},{chestY - 38} {centerX - 6},{chestY - 40}
+Q {centerX},{chestY - 16} {centerX + 6},{chestY - 40}
+Q {centerX + 26},{chestY - 38} {centerX + chestOffset - 10},{chestY - 6}
+L {centerX + waistOffset - 8},{hipY - 18}
+L {centerX - waistOffset + 8},{hipY - 18}
+Z
+""";
+
             var svg = $"""
-<svg width="440" height="640" viewBox="0 0 440 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="440" height="760" viewBox="0 0 440 760" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="40" y1="24" x2="400" y2="612" gradientUnits="userSpaceOnUse">
       <stop stop-color="#F7FBFC"/>
@@ -785,23 +887,29 @@ Return strict JSON with:
     <clipPath id="portraitMask">
       <rect x="86" y="64" width="268" height="248" rx="42" />
     </clipPath>
+    <clipPath id="headClip">
+      <circle cx="{centerX}" cy="{headCenterY}" r="{headRadius}" />
+    </clipPath>
   </defs>
-  <rect x="18" y="18" width="404" height="604" rx="36" fill="url(#bg)"/>
-  <rect x="38" y="38" width="364" height="564" rx="30" fill="#FFFFFF" fill-opacity="0.72" stroke="#D7E5EA"/>
+  <rect x="18" y="18" width="404" height="724" rx="36" fill="url(#bg)"/>
+  <rect x="38" y="38" width="364" height="684" rx="30" fill="#FFFFFF" fill-opacity="0.72" stroke="#D7E5EA"/>
   <rect x="86" y="64" width="268" height="248" rx="42" fill="#E8EFF2"/>
   {coverImage}
-  <circle cx="220" cy="390" r="118" fill="url(#accent)" opacity="0.18"/>
-  <ellipse cx="220" cy="392" rx="104" ry="124" fill="url(#skin)"/>
-  <circle cx="220" cy="232" r="54" fill="url(#skin)"/>
-  <rect x="195" y="274" width="50" height="30" rx="15" fill="url(#skin)"/>
-  <path d="M145 324C145 300.804 163.804 282 187 282H253C276.196 282 295 300.804 295 324V366C295 389.196 276.196 408 253 408H187C163.804 408 145 389.196 145 366V324Z" fill="#F6FBFC" fill-opacity="0.54"/>
-  <path d="M164 414C164 399.641 175.641 388 190 388H250C264.359 388 276 399.641 276 414V520C276 538.778 260.778 554 242 554H198C179.222 554 164 538.778 164 520V414Z" fill="url(#accent)" fill-opacity="0.78"/>
-  <rect x="126" y="430" width="52" height="120" rx="26" fill="url(#skin)"/>
-  <rect x="262" y="430" width="52" height="120" rx="26" fill="url(#skin)"/>
-  <rect x="176" y="548" width="34" height="18" rx="9" fill="{outline}" fill-opacity="0.78"/>
-  <rect x="230" y="548" width="34" height="18" rx="9" fill="{outline}" fill-opacity="0.78"/>
-  <text x="54" y="572" fill="#203540" font-family="Segoe UI, sans-serif" font-size="28" font-weight="700">{safeName}</text>
-  <text x="54" y="602" fill="#5C717B" font-family="Segoe UI, sans-serif" font-size="18">Avatar 2D • {safeBodyType}</text>
+  <circle cx="{centerX}" cy="{headCenterY}" r="{headRadius + 10}" fill="url(#accent)" opacity="0.16"/>
+  <circle cx="{centerX}" cy="{headCenterY}" r="{headRadius}" fill="url(#skin)"/>
+  {portraitImage}
+  <rect x="{centerX - neckWidth / 2}" y="{headCenterY + headRadius - 4}" width="{neckWidth}" height="34" rx="16" fill="url(#skin)"/>
+  <path d="{leftArmPath}" fill="url(#skin)" stroke="{outline}" stroke-opacity="0.12" />
+  <path d="{rightArmPath}" fill="url(#skin)" stroke="{outline}" stroke-opacity="0.12" />
+  <path d="{leftLegPath}" fill="url(#skin)" stroke="{outline}" stroke-opacity="0.12" />
+  <path d="{rightLegPath}" fill="url(#skin)" stroke="{outline}" stroke-opacity="0.12" />
+  <path d="{torsoPath}" fill="url(#skin)" stroke="{outline}" stroke-opacity="0.12" />
+  <path d="{tankPath}" fill="url(#accent)" fill-opacity="0.9"/>
+  <path d="{shortsPath}" fill="{outline}" fill-opacity="0.88"/>
+  <rect x="{centerX - 38}" y="{ankleY - 2}" width="30" height="16" rx="8" fill="{outline}" fill-opacity="0.78"/>
+  <rect x="{centerX + 8}" y="{ankleY - 2}" width="30" height="16" rx="8" fill="{outline}" fill-opacity="0.78"/>
+  <text x="54" y="676" fill="#203540" font-family="Segoe UI, sans-serif" font-size="28" font-weight="700">{safeName}</text>
+  <text x="54" y="706" fill="#5C717B" font-family="Segoe UI, sans-serif" font-size="18">Avatar base • {safeBodyType}</text>
 </svg>
 """;
 
@@ -853,6 +961,13 @@ Return strict JSON with:
                 "#2B4452" => "#172833",
                 _ => "#44584A"
             };
+        }
+
+        private static double Clamp(double value, double min, double max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
         }
 
         private sealed class AvatarAttributeInference
